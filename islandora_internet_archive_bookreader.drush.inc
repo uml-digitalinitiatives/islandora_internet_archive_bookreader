@@ -72,9 +72,9 @@ function drush_islandora_internet_archive_bookreader_plugin() {
     $dirname = IABOOKREADER_ORIGINAL_DIR;
 
     // Remove any existing Internet Archive Bookreader plugin directory.
-    if (is_dir($dirname) || is_dir('iabookreader')) {
+    if (is_dir($dirname) || is_dir('bookreader')) {
       drush_delete_dir($dirname, TRUE);
-      drush_delete_dir('iabookreader', TRUE);
+      drush_delete_dir('bookreader', TRUE);
       drush_log(dt('A existing Internet Archive Bookreader plugin was deleted from @path', array('@path' => $path)), 'notice');
     }
 
@@ -82,9 +82,9 @@ function drush_islandora_internet_archive_bookreader_plugin() {
     drush_tarball_extract($filename);
 
     // Change the directory name to "iabookreader" if needed.
-    if ($dirname != 'iabookreader') {
-      drush_move_dir($dirname, 'iabookreader', TRUE);
-      $dirname = 'iabookreader';
+    if ($dirname != 'bookreader') {
+      drush_move_dir($dirname, 'bookreader', TRUE);
+      $dirname = 'bookreader';
     }
   }
 

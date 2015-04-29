@@ -259,6 +259,8 @@
   /**
    * Return which side, left or right, that a given page should be
    * displayed on.
+   *
+   * @see BookReader/BookReaderIA/BookReaderJSIA.php
    */
   IslandoraBookReader.prototype.getPageSide = function(index) {
     if ('rl' != this.pageProgression) {

@@ -20,6 +20,7 @@
     this.mode = settings.mode
     this.fullscreen = false;
     this.content_type = settings.content_type;
+    this.pageProgression = settings.pageProgression;
   }
 
   // Inherit from Internet Archive BookReader class.
@@ -108,7 +109,7 @@
             dimensions.width = parseInt(data.width);
             dimensions.height = parseInt(data.height);
           },
-          async: false,
+          async: false
         });
       }
       else {
@@ -186,7 +187,7 @@
       'svc_val_fmt': 'info:ofi/fmt:kev:mtx:jpeg2000',
       'svc.format': 'image/jpeg',
       'svc.level': this.settings.compression,
-      'svc.rotate': 0,
+      'svc.rotate': 0
     });
     return (base_uri + 'resolver?' + params);
   };
@@ -258,9 +259,30 @@
   /**
    * Return which side, left or right, that a given page should be
    * displayed on.
+   *
+   * @see BookReader/BookReaderIA/BookReaderJSIA.php
    */
   IslandoraBookReader.prototype.getPageSide = function(index) {
-    return this.settings.pageProgression.toUpperCase()[index & 0x1];
+    if ('rl' != this.pageProgression) {
+      // If pageProgression is not set RTL we assume it is LTR
+      if (0 == (index & 0x1)) {
+        // Even-numbered page
+        return 'R';
+      }
+      else {
+        // Odd-numbered page
+        return 'L';
+      }
+    }
+    else {
+      // RTL
+      if (0 == (index & 0x1)) {
+        return 'L';
+      }
+      else {
+        return 'R';
+      }
+    }
   }
 
   /**
@@ -579,7 +601,7 @@
    */
   IslandoraBookReader.prototype.realignPages = function() {
     $('div#BookReader').css({
-      'height': '100%',
+      'height': '100%'
     });
     var br_top = '0';
     if (this.fullscreen) {
@@ -588,7 +610,7 @@
     br_top += 'px';
     $('div#BRcontainer').css({
       'height':'100%',
-      'top':br_top 
+      'top':br_top
     });
     //this little hack re-centers the pages
     this.zoom(1);
@@ -611,7 +633,7 @@
       }
       this.resetReaderSizeAndStyle(height, top);
       $('div#BookReader').css({
-        'height': '100%',
+        'height': '100%'
       });
     }
     else {
@@ -855,4 +877,53 @@
     BookReader.prototype.prepareFlipRightToLeft.call(this, nextL, nextR);
   }
 
+  /**
+   * Override the autoToggle function to reset back to the zero index.
+   *
+   * Overridden because IAV sets the index back to 1 when it should be 0.
+   */
+  IslandoraBookReader.prototype.autoToggle = function() {
+    this.ttsStop();
+
+    var bComingFrom1up = false;
+    if (2 != this.mode) {
+      bComingFrom1up = true;
+      this.switchMode(2);
+    }
+
+    // Change to autofit if book is too large
+    if (this.reduce < this.twoPageGetAutofitReduce()) {
+      this.zoom2up('auto');
+    }
+
+    var self = this;
+    if (null == this.autoTimer) {
+      this.flipSpeed = 2000;
+
+      // $$$ Draw events currently cause layout problems when they occur during animation.
+      //     There is a specific problem when changing from 1-up immediately to autoplay in RTL so
+      //     we workaround for now by not triggering immediate animation in that case.
+      //     See https://bugs.launchpad.net/gnubook/+bug/328327
+      if (('rl' == this.pageProgression) && bComingFrom1up) {
+          // don't flip immediately -- wait until timer fires
+      } else {
+          // flip immediately
+          this.flipFwdToIndex();
+      }
+
+      $('#BRtoolbar .play').hide();
+      $('#BRtoolbar .pause').show();
+      this.autoTimer=setInterval(function(){
+        if (self.animating) {return;}
+
+          if (Math.max(self.twoPage.currentIndexL, self.twoPage.currentIndexR) >= self.lastDisplayableIndex()) {
+            self.flipBackToIndex(0); // $$$ really what we want?
+          } else {
+            self.flipFwdToIndex();
+          }
+      },5000);
+    } else {
+        this.autoStop();
+    }
+  }
 })(jQuery);

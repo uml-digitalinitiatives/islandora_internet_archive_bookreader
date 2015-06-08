@@ -829,16 +829,18 @@
 
   /**
    * Update the location hash only change it when it actually changes, as some
-   * browsers can't handle that shit.
+   * browsers can't handle that stuff.
    */
   IslandoraBookReader.prototype.updateLocationHash = function() {
     // Updated with fix to recent bug found in the Archive Viewer that
     // prevents the last page from displaying the correct transcriptions
     // or hash links.
-    var page_string = $('#pagenum').children('.currentpage').html();
-    if (page_string != null) {
+
+    // Get the current page, from elements text.
+    var page_string = $('#pagenum .currentpage').text();
+    if (page_string) {
       var p_arr = page_string.split(" ");
-      var p_index = p_arr[1]
+      var p_index = p_arr[1];
       index = p_index;
     }
     else {
@@ -846,15 +848,17 @@
     }
 
     var newHash = '#' + this.fragmentFromParams(this.paramsFromCurrent());
-    if (page_string != this.currentIndex()) {
+    if (page_string != this.currentIndex() && page_string) {
       var param_data = this.fragmentFromParams(this.paramsFromCurrent()).split("/");
       param_data[1] = index;
       newHash = '#' + replaceAll(',','/',param_data.toString());
     }
+
     // End bug fix.
     if (this.oldLocationHash != newHash) {
       window.location.hash = newHash;
     }
+
     // This is the variable checked in the timer.  Only user-generated changes
     // to the URL will trigger the event.
     this.oldLocationHash = newHash;

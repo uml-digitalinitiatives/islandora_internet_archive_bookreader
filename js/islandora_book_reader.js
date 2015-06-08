@@ -838,7 +838,6 @@
 
     // Get the current page, from elements text.
     var page_string = $('#pagenum .currentpage').text();
-    console.log("page string::" + page_string);
     if (page_string) {
       var p_arr = page_string.split(" ");
       var p_index = p_arr[1];

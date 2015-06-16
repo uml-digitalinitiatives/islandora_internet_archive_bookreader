@@ -39,6 +39,8 @@ div#BRfulltext .BRfloat {
 div#BRfulltext .BRfloatMeta {
   overflow: auto;
   height: auto !important;
+  /* Prevents hiding text. */
+  max-height: 600px;
 }
 div.BRfloatHead {
   background-color: #ccc !important;
@@ -111,10 +113,6 @@ div.BRprogresspopup {
 #colorbox, #cboxOverlay, #cboxWrapper, #cboxContent, #cboxLoadedContent {
   max-width: 100%;
   height: 100% !important;
-}
-#colorbox, #cboxWrapper {
-  /* Prevents hiding text. */
-  overflow: visible;
 }
 #cboxWrapper {
   background: none; /* Used to eliminate white background */

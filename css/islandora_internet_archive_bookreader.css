@@ -39,6 +39,8 @@ div#BRfulltext .BRfloat {
 div#BRfulltext .BRfloatMeta {
   overflow: auto;
   height: auto !important;
+  /* Prevents hiding text. */
+  max-height: 600px;
 }
 div.BRfloatHead {
   background-color: #ccc !important;

@@ -89,7 +89,7 @@ function islandora_internet_archive_bookreader_search_callback($object_id, $term
  */
 function islandora_internet_archive_bookreader_get_image_uri_callback($object_id) {
   $tn = 'JP2';
-  if (variable_get('internet_archive_bookreader_use_backup_dsid', FALSE)) {
+  if (variable_get('islandora_internet_archive_bookreader_use_backup_dsid', FALSE)) {
     // TODO: We _think_ that Djatoka won't accept JP2s under 4 kibibytes, but
     // it's unclear if that number is configured, or tied to something, or even
     // if it's correct. We should investigate and make sure it's accurate.

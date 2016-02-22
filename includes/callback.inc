@@ -88,27 +88,23 @@ function islandora_internet_archive_bookreader_search_callback($object_id, $term
  *   The DSID of the object with JP2/JPG datastreams.
  */
 function islandora_internet_archive_bookreader_get_image_uri_callback($object_id) {
+  $dsid = 'JP2';
+  if (variable_get('islandora_internet_archive_bookreader_use_backup_dsid', FALSE)) {
+    // TODO: We _think_ that Djatoka won't accept JP2s under 4 kibibytes, but
+    // it's unclear if that number is configured, or tied to something, or even
+    // if it's correct. We should investigate and make sure it's accurate.
+    $jp2 = islandora_datastream_load('JP2', $object_id);
+    $dsid = $jp2->size >= 4096 ? 'JP2' : 'JPG';
+  }
+
   module_load_include('inc', 'islandora', 'includes/authtokens');
-  $jp2 = islandora_datastream_load('JP2', $object_id);
-  // TODO: We _think_ that Djatoka won't accept JP2s under 4 kibibytes, but
-  // it's unclear if that number is configured, or tied to something, or even
-  // if it's correct. We should investigate and make sure it's accurate.
-  if ($jp2->size >= 4096) {
-    $uri = url("islandora/object/{$object_id}/datastream/JP2/view", array(
-      'absolute' => TRUE,
-      'query' => array(
-        'token' => islandora_get_object_token($object_id, 'JP2', 2),
-      ),
-    ));
-  }
-  else {
-    $uri = url("islandora/object/{$object_id}/datastream/JPG/view", array(
-      'absolute' => TRUE,
-      'query' => array(
-        'token' => islandora_get_object_token($object_id, 'JPG', 2),
-      ),
-    ));
-  }
-  echo $uri;
+  $uri_params = array(
+    'absolute' => TRUE,
+    'query' => array(
+      'token' => islandora_get_object_token($object_id, $dsid, 2),
+    ),
+  );
+
+  echo url("islandora/object/{$object_id}/datastream/$dsid/view", $uri_params);
   drupal_exit();
 }

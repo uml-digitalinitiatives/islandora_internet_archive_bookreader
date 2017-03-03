@@ -38,4 +38,3 @@ script:
   # XXX: Move the 3rd-party library stuff back in, for tests.
   - mv $HOME/js $TRAVIS_BUILD_DIR
   - phpcpd --names *.module,*.inc,*.test sites/all/modules/islandora_internet_archive_bookreader
-  - drush test-run --uri=http://localhost:8081 "Islandora Internet Archive Bookreader"

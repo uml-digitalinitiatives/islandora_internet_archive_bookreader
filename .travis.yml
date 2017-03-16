@@ -1,3 +1,4 @@
+sudo: required
 language: php
 php:
   - 5.3.3
@@ -24,6 +25,9 @@ before_install:
   - ln -s $TRAVIS_BUILD_DIR sites/all/modules/islandora_internet_archive_bookreader
   - ln -s $HOME/islandora_paged_content sites/all/modules/islandora_paged_content
   - drush en --yes islandora_internet_archive_bookreader
+before_script:
+  # Mysql might time out for long tests, increase the wait timeout.
+  - mysql -e 'SET @@GLOBAL.wait_timeout=1200'
 script:
   - ant -buildfile sites/all/modules/islandora_internet_archive_bookreader/build.xml lint
   # XXX: Move the 3rd-party library stuff out of the way, so it doesn't
@@ -34,4 +38,3 @@ script:
   # XXX: Move the 3rd-party library stuff back in, for tests.
   - mv $HOME/js $TRAVIS_BUILD_DIR
   - phpcpd --names *.module,*.inc,*.test sites/all/modules/islandora_internet_archive_bookreader
-  - drush test-run --uri=http://localhost:8081 "Islandora Internet Archive Bookreader"

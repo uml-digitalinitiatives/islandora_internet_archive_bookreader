@@ -34,9 +34,9 @@ Note: If you use the Drush command, it is advisable to Move (not copy) the insta
 
 ## Configuration
 
-Set the 'djatoka image compression level', 'Solr field relating pages to book PIDs ', 'Overlay Opacity', and select the 'Default page view' in Administration » Islandora » Islandora Viewers » Internet Archive BookReader (/admin/islandora/islandora_viewers/internet_archive_bookreader).
+Set the 'djatoka image compression level', 'Solr field relating pages to book PIDs ', 'Overlay Opacity', a content type to be displayed in the IAV, and select the 'Default page view' in Administration » Islandora » Islandora Viewers » Internet Archive BookReader (/admin/islandora/islandora_viewers/internet_archive_bookreader). Additional options involve behavior for mobile users, and using the JPG datastream as a backup in case Djatoka cannot return a JP2.
 
-![Configuration](https://camo.githubusercontent.com/aa7eedad6565217229eba6020baafafd67d42c76/687474703a2f2f692e696d6775722e636f6d2f523341684b70422e706e67)
+![Configuration](https://cloud.githubusercontent.com/assets/10052068/24043645/fce70382-0aed-11e7-9e70-11678aa7d1df.png)
 
 ## Documentation
 

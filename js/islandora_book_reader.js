@@ -565,6 +565,17 @@
     this.buildShareDiv($('#BRshare'));
   }
 
+  IslandoraBookReader.prototype.initNavbar = function() {
+   BookReader.prototype.initNavbar.call(this);
+    // Normally this would go into main init just after 
+    // the navbar is created, but that would imply
+    // rewriting current old init().
+   this.resizeBRcontainer();
+  }
+
+
+
+
   /**
    * Window resize event callback, handles admin menu
    * in Drupal.
@@ -593,6 +604,39 @@
       'z-index': '700'
     });
     this.realignPages();
+  }
+
+  /**
+   * Resizes the inner container to fit within the visible space.
+   * 
+   * Prevents the top toolbar and bottom navbar from clipping the visible book.
+   * Function mostly borrowed from 3.18 to maintain consistency.
+   */ 
+  IslandoraBookReader.prototype.resizeBRcontainer = function() {
+    $('#BRcontainer').css({
+      top: offset,
+      bottom:  this.getToolBarHeight(),
+      'margin-bottom': parseInt($('#BRtoolbar').css('top'))
+    });
+  }
+  
+ /** 
+  * Function borrowed from 3.18 to make maintain consistency. 
+  */ 
+  IslandoraBookReader.prototype.getToolBarHeight = function() {
+    return ($('#BRtoolbar').outerHeight() + parseInt($('#BRtoolbar').css('top')));
+  }
+
+  /**
+   * Function borrowed from 3.18 to make maintain consistency. 
+   */
+  IslandoraBookReader.prototype.getNavHeight = function() {
+    var outerHeight = $('#BRnav').outerHeight();
+    var bottom = parseInt($('#BRnav').css('bottom'));
+    if (!isNaN(outerHeight) && !isNaN(bottom)) {
+      return outerHeight + bottom;
+    }
+  return 0;
   }
 
   /**
@@ -635,18 +679,20 @@
       $('div#BookReader').css({
         'height': '100%'
       });
+      // Push it down.
+      $('div#BRnav').css({'margin-top':'-40px'});
     }
     else {
       $('div#book-viewer').css({
       'position': 'relative',
       'z-index': '0'
       });
+      // really? Fixed to 680px everywhere    
       $('div#BookReader, div#BRcontainer').css({
         'height': '680px'
       });
-      $('div#BRcontainer').css({
-        'top': '0px'
-      });
+	  $('div#BRnav').css({'margin-top':'0px'});
+      this.resize();
       this.zoom(1);
       this.zoom(2);
     }
@@ -662,9 +708,10 @@
       'width': '100%',
       'height': '100%',
       'left': '0',
-      'top': top,
+      'top': '0',
       'z-index': '700'
     });
+    $('div#BRnav').css({'margin-top':'-40px'});
     $('div#BookReader, div#BRcontainer').css({
       'height': '100%'
     });
@@ -816,17 +863,192 @@
    * interface.
    */
   IslandoraBookReader.prototype.bindNavigationHandlers = function() {
-    BookReader.prototype.bindNavigationHandlers.apply(this);
-    $('.BRnavCntl').click(function(){
+    var that = this;
+    BookReader.prototype.bindNavigationHandlers.call(this);
+    
+    // The whole click mechanic is from the 80's
+    $('.BRnavCntl').unbind("click");
+     
+    $('.BRnavCntl').bind("click", that, function(e){
+        var that = e.data;
+        var shouldhappen = [];
+        var first = function($offset) {
+          var d1 = new $.Deferred();
+          $('#BRtoolbar').animate({top:$offset}, 500, "swing", function(){console.log("should be first");d1.resolve();console.log("should be last");});
+          return d1.promise();
+        };
+         var second = function($offset) {
+          var d2 = new $.Deferred();
+          $('#BRnav').animate({bottom:$offset}, function(){d2.resolve()});
+          return d2.promise();
+        };    
+        // So sad, coding for JQUERY 1.5 in 2017!
+    // So sad, coding for JQUERY 1.5 in 2017!
       if ($('#BRnavCntlBtm').hasClass('BRdn')) {
-        $('#BookReader').css('overflow', 'visible');
-      }
-      else {
         $('#BookReader').css('overflow', 'hidden');
+        
+          shouldhappen.push(first(-40));
+          shouldhappen.push(second(-55));
+
+          $('#BRnavCntlBtm').addClass('BRup').removeClass('BRdn');
+          $('#BRnavCntlTop').addClass('BRdn').removeClass('BRup');
+          $('#BRnavCntlBtm.BRnavCntl').animate({height:'45px'});
+          $('.BRnavCntl').delay(1000).animate({opacity:.25}, 1000);
+        } else {
+          $('#BookReader').css('overflow', 'visible');
+          shouldhappen.push(first(0));
+          shouldhappen.push(second(0));
+          $('#BRnavCntlBtm').addClass('BRdn').removeClass('BRup');
+          $('#BRnavCntlTop').addClass('BRup').removeClass('BRdn');
+          $('#BRnavCntlBtm.BRnavCntl').animate({height:'30px'});
+          $('.BRvavCntl').animate({opacity:1})
+        };
+        $.when.apply($, shouldhappen).done(function() {
+         
+          // Only do full resize in auto mode and need to recalc. size
+          if (that.mode == that.constMode2up && that.twoPage.autofit != null && that.twoPage.autofit != 'none') {
+            that.resize();
+          } else if (that.mode == that.constMode1up && that.onePage.autofit != null && that.onePage.autofit != 'none') {
+            that.resize();
+          } else {
+            // Don't do a full resize to avoid redrawing images
+            that.resizeBRcontainer();
       }
     });
   }
+    );
+  }
+  /**
+   * Resize handler.
+   * 
+   */
 
+  IslandoraBookReader.prototype.resize =function() {
+
+      this.resizeBRcontainer();
+
+      if (this.constMode1up == this.mode) {
+          if (this.onePage.autofit != 'none') {
+              this.resizePageView();
+              this.centerPageView();
+              this.updateSearchHilites(); //deletes hilights but does not call remove()
+          } else {
+              this.centerPageView();
+              this.displayedIndices = [];
+              this.updateSearchHilites(); //deletes hilights but does not call remove()
+              this.drawLeafsThrottled();
+          }
+      } else if (this.constModeThumb == this.mode){
+          this.prepareThumbnailView();
+      } else {
+          //console.log('drawing 2 page view');
+
+          // We only need to prepare again in autofit (size of spread changes)
+          if (this.twoPage.autofit) {
+              this.prepareTwoPageView();
+          } else {
+              // Re-center if the scrollbars have disappeared
+              var center = this.twoPageGetViewCenter();
+              var doRecenter = false;
+              if (this.twoPage.totalWidth < $('#BRcontainer').attr('clientWidth')) {
+                  center.percentageX = 0.5;
+                  doRecenter = true;
+              }
+              if (this.twoPage.totalHeight < $('#BRcontainer').attr('clientHeight')) {
+                  center.percentageY = 0.5;
+                  doRecenter = true;
+              }
+              if (doRecenter) {
+                  this.twoPageCenterView(center.percentageX, center.percentageY);
+              }
+          }
+      }
+    }
+
+   IslandoraBookReader.prototype.resizePageView = function() {
+        switch (this.mode) {
+            case this.constMode1up:
+                this.resizePageView1up(); // $$$ necessary in non-1up mode?
+                break;
+            case this.constMode2up:
+                break;
+            case this.constModeThumb:
+                this.prepareThumbnailView( this.currentIndex() );
+                break;
+            default:
+                alert('Resize not implemented for this mode');
+        }
+    }
+
+    // Resize the current one page view
+    // Note this calls drawLeafs
+    IslandoraBookReader.prototype.resizePageView1up = function() {
+        // console.log('resizePageView1up');
+        var i;
+        var viewHeight = 0;
+        //var viewWidth  = $('#BRcontainer').width(); //includes scrollBar
+        var viewWidth  = $('#BRcontainer').attr('clientWidth');
+
+        var oldScrollTop  = $('#BRcontainer').attr('scrollTop');
+        //var oldScrollLeft = $('#BRcontainer').attr('scrollLeft');
+
+        var oldPageViewHeight = $('#BRpageview').height();
+        var oldPageViewWidth = $('#BRpageview').width();
+
+        // May have come here after preparing the view, in which case the scrollTop and view height are not set
+
+        var scrollRatio = 0;
+        if (oldScrollTop > 0) {
+            // We have scrolled - implies view has been set up
+            var oldCenterY = this.centerY1up();
+            var oldCenterX = this.centerX1up();
+            scrollRatio = oldCenterY / oldPageViewHeight;
+        } else {
+            // Have not scrolled, e.g. because in new container
+
+            // We set the scroll ratio so that the current index will still be considered the
+            // current index in drawLeafsOnePage after we create the new view container
+
+            // Make sure this will count as current page after resize
+            // console.log('fudging for index ' + this.currentIndex() + ' (page ' + this.getPageNum(this.currentIndex()) + ')');
+            var fudgeFactor = (this.getPageHeight(this.currentIndex()) / this.reduce) * 0.6;
+            var oldLeafTop = this.onePageGetPageTop(this.currentIndex()) + fudgeFactor;
+            var oldViewDimensions = this.onePageCalculateViewDimensions(this.reduce, this.padding);
+            scrollRatio = oldLeafTop / oldViewDimensions.height;
+        }
+
+        // Recalculate 1up reduction factors
+        this.onePageCalculateReductionFactors();
+        // Update current reduce (if in autofit)
+        if (this.onePage.autofit) {
+            var reductionFactor = this.nextReduce(this.reduce, this.onePage.autofit, this.onePage.reductionFactors);
+            this.reduce = reductionFactor.reduce;
+        }
+
+        var viewDimensions = this.onePageCalculateViewDimensions(this.reduce, this.padding);
+
+        $('#BRpageview').height(viewDimensions.height);
+        $('#BRpageview').width(viewDimensions.width);
+
+
+        var newCenterY = scrollRatio*viewDimensions.height;
+        var newTop = Math.max(0, Math.floor( newCenterY - $('#BRcontainer').height()/2 ));
+        $('#BRcontainer').attr('scrollTop', newTop);
+
+        // We use clientWidth here to avoid miscalculating due to scroll bar
+        var newCenterX = oldCenterX * (viewWidth / oldPageViewWidth);
+        var newLeft = newCenterX - $('#BRcontainer').attr('clientWidth') / 2;
+        newLeft = Math.max(newLeft, 0);
+        $('#BRcontainer').attr('scrollLeft', newLeft);
+        //console.log('oldCenterX ' + oldCenterX + ' newCenterX ' + newCenterX + ' newLeft ' + newLeft);
+
+        $('#BRpageview').empty();
+        this.displayedIndices = [];
+        this.drawLeafs();
+
+        this.removeSearchHilites();
+        this.updateSearchHilites();
+    }  
   /**
    * Update the location hash only change it when it actually changes, as some
    * browsers can't handle that stuff.
@@ -880,6 +1102,360 @@
     $(this.prefetchedImgs[nextR]).removeAttr('style');
     BookReader.prototype.prepareFlipRightToLeft.call(this, nextL, nextR);
   }
+  
+  // drawLeafsOnePage()
+  IslandoraBookReader.prototype.drawLeafsOnePage = function() {
+      //console.log('drawLeafsOnePage', this.firstIndex, this.currentIndex());
+      var containerHeight = $('#BRcontainer').height();
+      var scrollTop = $('#BRcontainer').attr('scrollTop');
+      var scrollBottom = scrollTop + containerHeight;
+      // console.log('top=' + scrollTop + ' bottom='+scrollBottom);
+      //var viewWidth = $('#BRpageview').width(); //includes scroll bar width
+      var viewWidth = $('#BRcontainer').attr('scrollWidth');
+
+      var indicesToDisplay = [];
+
+      var i;
+      var leafTop = 0;
+      var leafBottom = 0;
+      for (i=0; i<this.numLeafs; i++) {
+          var height  = parseInt(this._getPageHeight(i)/this.reduce);
+
+          leafBottom += height;
+          //console.log('leafTop = '+leafTop+ ' pageH = ' + this._getPageHeight(i) + 'leafTop>=scrollTop=' + (leafTop>=scrollTop));
+          var topInView    = (leafTop >= scrollTop) && (leafTop <= scrollBottom);
+          var bottomInView = (leafBottom >= scrollTop) && (leafBottom <= scrollBottom);
+          var middleInView = (leafTop <=scrollTop) && (leafBottom>=scrollBottom);
+          if (topInView | bottomInView | middleInView) {
+              //console.log('displayed: ' + this.displayedIndices);
+              //console.log('to display: ' + i);
+              indicesToDisplay.push(i);
+          }
+          leafTop += height +10;
+          leafBottom += 10;
+      }
+
+      // Based of the pages displayed in the view we set the current index
+      // $$$ we should consider the page in the center of the view to be the current one
+      var firstIndexToDraw  = indicesToDisplay[0];
+      this.firstIndex = firstIndexToDraw;
+
+      // Update hash, but only if we're currently displaying a leaf
+      // Hack that fixes #365790
+      if (this.displayedIndices.length > 0) {
+          this.updateLocationHash();
+      }
+
+      if ((0 != firstIndexToDraw) && (1 < this.reduce)) {
+          firstIndexToDraw--;
+          indicesToDisplay.unshift(firstIndexToDraw);
+      }
+
+      var lastIndexToDraw = indicesToDisplay[indicesToDisplay.length-1];
+      if ( ((this.numLeafs-1) != lastIndexToDraw) && (1 < this.reduce) ) {
+          indicesToDisplay.push(lastIndexToDraw+1);
+      }
+
+      var BRpageViewEl = document.getElementById('BRpageview');
+
+      leafTop = 0;
+      var i;
+      for (i=0; i<firstIndexToDraw; i++) {
+          leafTop += parseInt(this._getPageHeight(i)/this.reduce) +10;
+      }
+
+      for (i=0; i<indicesToDisplay.length; i++) {
+          var index = indicesToDisplay[i];
+          var height  = parseInt(this._getPageHeight(index)/this.reduce);
+
+          if (BookReader.util.notInArray(indicesToDisplay[i], this.displayedIndices)) {
+              var width   = parseInt(this._getPageWidth(index)/this.reduce);
+              //console.log("displaying leaf " + indicesToDisplay[i] + ' leafTop=' +leafTop);
+              var div = document.createElement('div');
+              div.className = 'BRpagediv1up';
+              div.id = 'pagediv'+index;
+              div.style.position = "absolute";
+              div.style.top = leafTop + 'px';
+              var left = (viewWidth-width)>>1;
+              if (left<0) left = 0;
+              div.style.left = left + 'px';
+              div.style.width = width + 'px';
+              div.style.height = height + 'px';
+              //$(div).text('loading...');
+
+              BRpageViewEl.appendChild(div);
+
+              var img = document.createElement('img');
+              img.src = this._getPageURI(index, this.reduce, 0);
+              img.className = 'BRnoselect BRonePageImage';
+              img.style.width = width + 'px';
+              img.style.height = height + 'px';
+              div.appendChild(img);
+          } else {
+              //console.log("not displaying " + indicesToDisplay[i] + ' score=' + jQuery.inArray(indicesToDisplay[i], this.displayedIndices));
+          }
+
+          leafTop += height +10;
+
+      }
+
+      for (i=0; i<this.displayedIndices.length; i++) {
+          if (BookReader.util.notInArray(this.displayedIndices[i], indicesToDisplay)) {
+              var index = this.displayedIndices[i];
+              //console.log('Removing leaf ' + index);
+              //console.log('id='+'#pagediv'+index+ ' top = ' +$('#pagediv'+index).css('top'));
+              $('#pagediv'+index).remove();
+          } else {
+              //console.log('NOT Removing leaf ' + this.displayedIndices[i]);
+          }
+      }
+
+      this.displayedIndices = indicesToDisplay.slice();
+      this.updateSearchHilites();
+
+      if (null != this.getPageNum(firstIndexToDraw))  {
+          $("#BRpagenum").val(this.getPageNum(this.currentIndex()));
+      } else {
+          $("#BRpagenum").val('');
+      }
+
+      this.updateToolbarZoom(this.reduce);
+
+      // Update the slider
+      this.updateNavIndexThrottled();
+  }
+
+  // drawLeafsThumbnail()
+  // If seekIndex is defined, the view will be drawn with that page visible (without any
+  // animated scrolling)
+  IslandoraBookReader.prototype.drawLeafsThumbnail = function( seekIndex ) {
+
+      var viewWidth = $('#BRcontainer').attr('scrollWidth') - 20; // width minus buffer
+
+      var i;
+      var leafWidth;
+      var leafHeight;
+      var rightPos = 0;
+      var bottomPos = 0;
+      var maxRight = 0;
+      var currentRow = 0;
+      var leafIndex = 0;
+      var leafMap = [];
+
+      var self = this;
+
+      // Will be set to top of requested seek index, if set
+      var seekTop;
+
+      // Calculate the position of every thumbnail.  $$$ cache instead of calculating on every draw
+      for (i=0; i<this.numLeafs; i++) {
+          leafWidth = this.thumbWidth;
+          if (rightPos + (leafWidth + this.thumbPadding) > viewWidth){
+              currentRow++;
+              rightPos = 0;
+              leafIndex = 0;
+          }
+
+          if (leafMap[currentRow]===undefined) { leafMap[currentRow] = {}; }
+          if (leafMap[currentRow].leafs===undefined) {
+              leafMap[currentRow].leafs = [];
+              leafMap[currentRow].height = 0;
+              leafMap[currentRow].top = 0;
+          }
+          leafMap[currentRow].leafs[leafIndex] = {};
+          leafMap[currentRow].leafs[leafIndex].num = i;
+          leafMap[currentRow].leafs[leafIndex].left = rightPos;
+
+          leafHeight = parseInt((this.getPageHeight(leafMap[currentRow].leafs[leafIndex].num)*this.thumbWidth)/this.getPageWidth(leafMap[currentRow].leafs[leafIndex].num), 10);
+          if (leafHeight > leafMap[currentRow].height) {
+              leafMap[currentRow].height = leafHeight;
+          }
+          if (leafIndex===0) { bottomPos += this.thumbPadding + leafMap[currentRow].height; }
+          rightPos += leafWidth + this.thumbPadding;
+          if (rightPos > maxRight) { maxRight = rightPos; }
+          leafIndex++;
+
+          if (i == seekIndex) {
+              seekTop = bottomPos - this.thumbPadding - leafMap[currentRow].height;
+          }
+      }
+
+      // reset the bottom position based on thumbnails
+      $('#BRpageview').height(bottomPos);
+
+      var pageViewBuffer = Math.floor(($('#BRcontainer').attr('scrollWidth') - maxRight) / 2) - 14;
+
+      // If seekTop is defined, seeking was requested and target found
+      if (typeof(seekTop) != 'undefined') {
+          $('#BRcontainer').scrollTop( seekTop );
+      }
+
+      var scrollTop = $('#BRcontainer').attr('scrollTop');
+      var scrollBottom = scrollTop + $('#BRcontainer').height();
+
+      var leafTop = 0;
+      var leafBottom = 0;
+      var rowsToDisplay = [];
+
+      // Visible leafs with least/greatest index
+      var leastVisible = this.numLeafs - 1;
+      var mostVisible = 0;
+
+      // Determine the thumbnails in view
+      for (i=0; i<leafMap.length; i++) {
+          leafBottom += this.thumbPadding + leafMap[i].height;
+          var topInView    = (leafTop >= scrollTop) && (leafTop <= scrollBottom);
+          var bottomInView = (leafBottom >= scrollTop) && (leafBottom <= scrollBottom);
+          var middleInView = (leafTop <=scrollTop) && (leafBottom>=scrollBottom);
+          if (topInView | bottomInView | middleInView) {
+              //console.log('row to display: ' + j);
+              rowsToDisplay.push(i);
+              if (leafMap[i].leafs[0].num < leastVisible) {
+                  leastVisible = leafMap[i].leafs[0].num;
+              }
+              if (leafMap[i].leafs[leafMap[i].leafs.length - 1].num > mostVisible) {
+                  mostVisible = leafMap[i].leafs[leafMap[i].leafs.length - 1].num;
+              }
+          }
+          if (leafTop > leafMap[i].top) { leafMap[i].top = leafTop; }
+          leafTop = leafBottom;
+      }
+
+      // create a buffer of preloaded rows before and after the visible rows
+      var firstRow = rowsToDisplay[0];
+      var lastRow = rowsToDisplay[rowsToDisplay.length-1];
+      for (i=1; i<this.thumbRowBuffer+1; i++) {
+          if (lastRow+i < leafMap.length) { rowsToDisplay.push(lastRow+i); }
+      }
+      for (i=1; i<this.thumbRowBuffer+1; i++) {
+          if (firstRow-i >= 0) { rowsToDisplay.push(firstRow-i); }
+      }
+
+      // Create the thumbnail divs and images (lazy loaded)
+      var j;
+      var row;
+      var left;
+      var index;
+      var div;
+      var link;
+      var img;
+      var page;
+      for (i=0; i<rowsToDisplay.length; i++) {
+          if (BookReader.util.notInArray(rowsToDisplay[i], this.displayedRows)) {
+              row = rowsToDisplay[i];
+
+              for (j=0; j<leafMap[row].leafs.length; j++) {
+                  index = j;
+                  leaf = leafMap[row].leafs[j].num;
+
+                  leafWidth = this.thumbWidth;
+                  leafHeight = parseInt((this.getPageHeight(leaf)*this.thumbWidth)/this.getPageWidth(leaf), 10);
+                  leafTop = leafMap[row].top;
+                  left = leafMap[row].leafs[index].left + pageViewBuffer;
+                  if ('rl' == this.pageProgression){
+                      left = viewWidth - leafWidth - left;
+                  }
+
+                  div = document.createElement("div");
+                  div.id = 'pagediv'+leaf;
+                  div.style.position = "absolute";
+                  div.className = "BRpagedivthumb";
+
+                  left += this.thumbPadding;
+                  div.style.top = leafTop + 'px';
+                  div.style.left = left + 'px';
+                  div.style.width = leafWidth + 'px';
+                  div.style.height = leafHeight + 'px';
+                  //$(div).text('loading...');
+
+                  // link to page in single page mode
+                  link = document.createElement("a");
+                  $(link).data('leaf', leaf);
+                  link.addEventListener('mouseup', function(event) {
+                    self.firstIndex = $(this).data('leaf');
+                    if (self._prevReadMode !== undefined) {
+                      self.switchMode(self._prevReadMode);
+                    } else {
+                      self.switchMode(self.constMode1up);
+                    }
+                    event.preventDefault();
+                    event.stopPropagation();
+                  }, true);
+                  $(div).append(link);
+
+                  $('#BRpageview').append(div);
+
+                  img = document.createElement("img");
+                  var thumbReduce = Math.floor(this.getPageWidth(leaf) / this.thumbWidth);
+
+                  $(img).attr('src', this.imagesBaseURL + 'transparent.png')
+                      .css({'width': leafWidth+'px', 'height': leafHeight+'px' })
+                      .addClass('BRlazyload')
+                      // Store the URL of the image that will replace this one
+                      .data('srcURL',  this._getPageURI(leaf, thumbReduce));
+                  $(link).append(img);
+                  //console.log('displaying thumbnail: ' + leaf);
+              }
+          }
+      }
+
+      // Remove thumbnails that are not to be displayed
+      var k;
+      for (i=0; i<this.displayedRows.length; i++) {
+          if (BookReader.util.notInArray(this.displayedRows[i], rowsToDisplay)) {
+              row = this.displayedRows[i];
+
+              // $$$ Safari doesn't like the comprehension
+              //var rowLeafs =  [leaf.num for each (leaf in leafMap[row].leafs)];
+              //console.log('Removing row ' + row + ' ' + rowLeafs);
+
+              for (k=0; k<leafMap[row].leafs.length; k++) {
+                  index = leafMap[row].leafs[k].num;
+                  //console.log('Removing leaf ' + index);
+                  $('#pagediv'+index).remove();
+              }
+          } else {
+              // var mRow = this.displayedRows[i];
+              // var mLeafs = '[' +  [leaf.num for each (leaf in leafMap[mRow].leafs)] + ']';
+              // console.log('NOT Removing row ' + mRow + ' ' + mLeafs);
+          }
+      }
+
+      // Update which page is considered current to make sure a visible page is the current one
+      var currentIndex = this.currentIndex();
+      if (currentIndex < leastVisible) {
+          this.setCurrentIndex(leastVisible);
+      } else if (currentIndex > mostVisible) {
+          this.setCurrentIndex(mostVisible);
+      }
+      this.updateNavIndexThrottled();
+
+      this.displayedRows = rowsToDisplay.slice();
+
+      // Update hash, but only if we're currently displaying a leaf
+      // Hack that fixes #365790
+      if (this.displayedRows.length > 0) {
+          this.updateLocationHash();
+      }
+
+      // remove previous highlights
+      $('.BRpagedivthumb_highlight').removeClass('BRpagedivthumb_highlight');
+
+      // highlight current page
+      $('#pagediv'+this.currentIndex()).addClass('BRpagedivthumb_highlight');
+
+      this.lazyLoadThumbnails();
+
+      // Update page number box.  $$$ refactor to function
+      if (null !== this.getPageNum(this.currentIndex()))  {
+          $("#BRpagenum").val(this.getPageNum(this.currentIndex()));
+      } else {
+          $("#BRpagenum").val('');
+      }
+
+      this.updateToolbarZoom(this.reduce);
+  }
+  
 
   /**
    * Override the autoToggle function to reset back to the zero index.

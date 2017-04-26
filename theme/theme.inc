@@ -61,49 +61,48 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
     'group' => CSS_SYSTEM,
   ));
   drupal_add_css("$module_path/css/islandora_internet_archive_bookreader.css");
-  // Included jQuery 1.4.2 and jQueryUI 1.8.5 are not being used in favor of
-  // the Drupal system versions.
+  
   drupal_add_library('system', 'effects');
   drupal_add_library('system', 'ui.slider');
   drupal_add_library('system', 'ui.draggable');
 
-  // XXX: Extra slash is NOT an error or a mistake. We need to add this JS
-  // both before and after our custom jQuery gets setup, as we need it in both
-  // instances of jQuery.
-  drupal_add_js("$library_path/BookReader//jquery.bt.min.js", array(
+ 
+  drupal_add_js("$library_path/BookReader/jquery.colorbox-min.js", array(
     'group' => JS_LIBRARY,
     'weight' => -6,
-  ));
+  ));    
+  
   drupal_add_js("$module_path/js/detectmobilebrowser.js",
     array(
       'group' => JS_LIBRARY,
       'weight' => -6,
     )
   );
-  // Add the required jQuery version, specifying weight.
-  drupal_add_js("$module_path/js/jquery_1_5.min.js", array(
-    'group' => JS_LIBRARY,
-    'weight' => -6,
-  ));
-  // We also need to be sure to use the correct jquery ui version.
-  drupal_add_js("$module_path/js/jquery.ui-1.8.10/jquery-ui.min.js", array(
-    'group' => JS_LIBRARY,
-    'weight' => -6,
-  ));
-  drupal_add_js("$library_path/BookReader/dragscrollable.js", array(
-    'group' => JS_LIBRARY,
-    'weight' => -6,
-  ));
-  // Use a newer version of color box as the version bundled with BookReader
-  // won't work with JQuery 1.4.4
-  drupal_add_js("$colorbox_path/jquery.colorbox-min.js", array(
-    'group' => JS_LIBRARY,
-    'weight' => -6,
-  ));
+  drupal_add_js("$library_path/BookReader/jquery.browser.min.js", array(
+      'group' => JS_LIBRARY,
+      'weight' => -6,
+    ));
+  
   drupal_add_js("$library_path/BookReader/jquery.bt.min.js", array(
     'group' => JS_LIBRARY,
     'weight' => -6,
+  )); 
+  
+  drupal_add_js("$library_path/BookReader/dragscrollable-br.js", array(
+    'group' => JS_LIBRARY,
+    'weight' => -6,
   ));
+  
+  drupal_add_js("$library_path/BookReader/mmenu/dist/js/jquery.mmenu.min.js", array(
+    'group' => JS_LIBRARY,
+    'weight' => -6,
+  ));
+  
+  drupal_add_js("$library_path/BookReader/mmenu/dist/addons/navbars/jquery.mmenu.navbars.min.js", array(
+    'group' => JS_LIBRARY,
+    'weight' => -6,
+  ));
+  
   drupal_add_js("$library_path/BookReader/BookReader.js", array(
     'group' => JS_LIBRARY,
     'weight' => -6,
@@ -118,6 +117,7 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
     'group' => JS_LIBRARY,
     'weight' => -3,
   ));
+  
   // The Internet Archive Book Reader, hijacks the URL anchor '#' for jumping to
   // particular page # / view modes. Drupal fieldset javascript code
   // (collapse.js) expects the URL anchor '#' to be a valid HTML ID, and fails

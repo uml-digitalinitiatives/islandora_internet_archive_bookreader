@@ -335,7 +335,16 @@
       }
   }
 
+  /**
+   * @param JInfoDiv DOM element. Appends info to this element
+   * Can be overridden or extended
+   */
+  IslandoraBookReader.prototype.buildInfoDiv = function(jInfoDiv) {
+      // Remove these legacy elements
+      jInfoDiv.find('.BRfloatBody, .BRfloatCover, .BRfloatFoot').remove();
 
+      $(this.settings.info).appendTo(jInfoDiv);
+  }
 
 
   /**

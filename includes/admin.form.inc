@@ -43,6 +43,12 @@ function islandora_internet_archive_bookreader_admin_settings_form(array $form, 
       '#element_validate' => array('element_validate_number'),
       '#default_value' => $get_default_value('islandora_internet_archive_bookreader_overlay_opacity', '0.5'),
     ),
+    'islandora_internet_archive_bookreader_content_type' => array(
+      '#type' => 'textfield',
+      '#title' => t('The content type being displayed within the IAV.'),
+      '#description' => t("This is what will be displayed in the viewer in places such as the info and share dialogs."),
+      '#default_value' => $get_default_value('islandora_internet_archive_bookreader_content_type', 'book'),
+    ),
     'islandora_internet_archive_bookreader_default_page_view' => array(
       '#type' => 'select',
       '#title' => t('Default page view'),
@@ -58,6 +64,12 @@ function islandora_internet_archive_bookreader_admin_settings_form(array $form, 
       '#type' => 'checkbox',
       '#title' => t('Force the Internet Archive Bookreader into full screen for mobile users?'),
       '#default_value' => variable_get('islandora_internet_archive_bookreader_mobile_full_screen', FALSE),
+    ),
+    'islandora_internet_archive_bookreader_use_backup_dsid' => array(
+      '#type' => 'checkbox',
+      '#title' => t('Use the JPG datastream as a backup'),
+      '#description' => t('Djatoka will not return JP2s smaller than 4096 bytes; by checking this, the bookreader will run a check and use the JPG datastream instead. NOTE: applying this setting can slow the bookreader down, especially for busy sites or large books. Be sure only to use this if necessary.'),
+      '#default_value' => variable_get('islandora_internet_archive_bookreader_use_backup_dsid', FALSE),
     ),
   );
   return system_settings_form($form);

@@ -8,31 +8,28 @@
 /**
  * Implements hook_preprocess_theme().
  */
-function islandora_internet_archive_bookreader_preprocess_islandora_internet_archive_bookreader(array &$variables) {
+function template_preprocess_islandora_internet_archive_bookreader(array &$variables) {
   module_load_include('inc', 'islandora_internet_archive_bookreader', 'includes/utilities');
+  module_load_include('inc', 'islandora', 'includes/authtokens');
   $object = $variables['object'];
   $dsid = $variables['datastream_id'];
   $library_path = libraries_get_path('bookreader');
   $colorbox_path = libraries_get_path('colorbox');
   $module_path = drupal_get_path('module', 'islandora_internet_archive_bookreader');
   $search_uri = module_exists('islandora_solr') ? url("internet_archive_bookreader_search/{$object->id}/TERM", array('absolute' => TRUE)) : NULL;
+  $backup_uris = variable_get('islandora_internet_archive_bookreader_use_backup_dsid', FALSE);
 
-  module_load_include('inc', 'islandora', 'includes/authtokens');
   $pages = array();
   foreach ($variables['pages'] as $page_pid => $info) {
-    $token = islandora_get_object_token($page_pid, $dsid, 2);
-
-    // TODO: Slap the widths/heights for pages in here, and make 'em be used in
-    // on the JS side...  Probably break out this structure generation into a
-    // separate function?
-    $pages[] = $info + array(
+    $addendum = $backup_uris ? array('pid' => $page_pid) : array(
       'uri' => url("islandora/object/{$page_pid}/datastream/{$dsid}/view", array(
         'absolute' => TRUE,
         'query' => array(
-          'token' => $token,
+          'token' => islandora_get_object_token($page_pid, $dsid, 2),
         ),
       )),
     );
+    $pages[] = $info + $addendum;
   }
 
   global $base_url;
@@ -44,6 +41,7 @@ function islandora_internet_archive_bookreader_preprocess_islandora_internet_arc
       'searchUri' => $search_uri,
       'textUri' => url('internet_archive_bookreader_text/PID', array('absolute' => TRUE)),
       'dimensionsUri' => url('internet_archive_bookreader_dimensions/PID', array('absolute' => TRUE)),
+      'tokenUri' => url('internet_archive_bookreader_get_image_uri/PID', array('absolute' => TRUE)),
       'djatokaUri' => variable_get('islandora_paged_content_djatoka_url', 'http://localhost:8080/adore-djatoka'),
       'imagesFolderUri' => url("$base_url/$library_path/BookReader/images/", array('absolute' => TRUE, 'external' => TRUE)),
       'compression' => variable_get('islandora_internet_archive_bookreader_compression', '4'),
@@ -53,6 +51,8 @@ function islandora_internet_archive_bookreader_preprocess_islandora_internet_arc
       'overlayOpacity' => variable_get('islandora_internet_archive_bookreader_overlay_opacity', '0.5'),
       'mode' => (int) variable_get('islandora_internet_archive_bookreader_default_page_view', 1),
       'mobilize' => variable_get('islandora_internet_archive_bookreader_mobile_full_screen', FALSE),
+      'content_type' => variable_get('islandora_internet_archive_bookreader_content_type', 'book'),
+      'useBackupUri' => $backup_uris,
     ),
   );
 
@@ -61,53 +61,63 @@ function islandora_internet_archive_bookreader_preprocess_islandora_internet_arc
     'group' => CSS_SYSTEM,
   ));
   drupal_add_css("$module_path/css/islandora_internet_archive_bookreader.css");
-  // Included jQuery 1.4.2 and jQueryUI 1.8.5 are not being used in favor of
-  // the Drupal system versions.
+  
   drupal_add_library('system', 'effects');
   drupal_add_library('system', 'ui.slider');
   drupal_add_library('system', 'ui.draggable');
 
-  // XXX: Extra slash is NOT an error or a mistake. We need to add this JS
-  // both before and after our custom jQuery gets setup, as we need it in both
-  // instances of jQuery.
-  drupal_add_js("$library_path/BookReader//jquery.bt.min.js", array(
+ 
+  drupal_add_js("$library_path/BookReader/jquery.colorbox-min.js", array(
     'group' => JS_LIBRARY,
-  ));
+    'weight' => -6,
+  ));    
+  
   drupal_add_js("$module_path/js/detectmobilebrowser.js",
     array(
       'group' => JS_LIBRARY,
+      'weight' => -6,
     )
   );
-  // Add the required jQuery version, specifying weight.
-  drupal_add_js("$module_path/js/jquery_1_5.min.js", array(
-    'group' => JS_LIBRARY,
-  ));
-  // We also need to be sure to use the correct jquery ui version.
-  drupal_add_js("$module_path/js/jquery.ui-1.8.10/jquery-ui.min.js", array(
-    'group' => JS_LIBRARY,
-  ));
-  drupal_add_js("$library_path/BookReader/dragscrollable.js", array(
-    'group' => JS_LIBRARY,
-  ));
-  // Use a newer version of color box as the version bundled with BookReader
-  // won't work with JQuery 1.4.4
-  drupal_add_js("$colorbox_path/jquery.colorbox-min.js", array(
-    'group' => JS_LIBRARY,
-  ));
+  drupal_add_js("$library_path/BookReader/jquery.browser.min.js", array(
+      'group' => JS_LIBRARY,
+      'weight' => -6,
+    ));
+  
   drupal_add_js("$library_path/BookReader/jquery.bt.min.js", array(
     'group' => JS_LIBRARY,
+    'weight' => -6,
+  )); 
+  
+  drupal_add_js("$library_path/BookReader/dragscrollable-br.js", array(
+    'group' => JS_LIBRARY,
+    'weight' => -6,
   ));
+  
+  drupal_add_js("$library_path/BookReader/mmenu/dist/js/jquery.mmenu.min.js", array(
+    'group' => JS_LIBRARY,
+    'weight' => -6,
+  ));
+  
+  drupal_add_js("$library_path/BookReader/mmenu/dist/addons/navbars/jquery.mmenu.navbars.min.js", array(
+    'group' => JS_LIBRARY,
+    'weight' => -6,
+  ));
+  
   drupal_add_js("$library_path/BookReader/BookReader.js", array(
     'group' => JS_LIBRARY,
+    'weight' => -6,
   ));
   drupal_add_js("$module_path/js/islandora_book_reader.js",
     array(
       'group' => JS_LIBRARY,
+      'weight' => -4,
     )
   );
   drupal_add_js("$module_path/js/islandora_internet_archive_bookreader.js", array(
     'group' => JS_LIBRARY,
+    'weight' => -3,
   ));
+  
   // The Internet Archive Book Reader, hijacks the URL anchor '#' for jumping to
   // particular page # / view modes. Drupal fieldset javascript code
   // (collapse.js) expects the URL anchor '#' to be a valid HTML ID, and fails

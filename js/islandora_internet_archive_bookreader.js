@@ -15,6 +15,10 @@
         $(window).resize(function() {
           bookReader.windowResize();
         });
+      // to avoid overflow icon on the bottom right side
+      $('div#BRpage').css({
+        'width': '300px'
+      });
         // We currently don't support read-aloud.
         $('#BRtoolbar').find('.read').hide();
         if (!bookReader.searchEnabled()) {

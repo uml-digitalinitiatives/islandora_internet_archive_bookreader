@@ -798,62 +798,6 @@
       this.resize();
   }
 
-  /**
-   * Toggle fullscreen viewer.
-   */
-  IslandoraBookReader.prototype.toggleFullScreen = function() {
-    this.fullscreen = (this.fullscreen ? false : true);
-    if(this.fullscreen) {
-      $('div#book-viewer').css({
-        'position': 'fixed',
-        'width': '100%',
-        'height': '100%',
-        'left': '0',
-        'top': '0',
-        'z-index': '700'
-      });
-      $('div#BookReader').css({
-        'height': '100%'
-      });
-
-      this.resize();
-    }
-    else {
-
-      $('div#book-viewer').css({
-      'position': 'relative',
-      'z-index': '0'
-      });
-      $('div#BookReader').css({
-        'height': ''
-      });
-
-      this.resize();
-    }
-  }
-
-  /**
-   * Go Fullscreen regardless of current state.
-   */
-  IslandoraBookReader.prototype.goFullScreen = function() {
-    this.fullscreen = true;
-      $('div#book-viewer').css({
-        'position': 'fixed',
-        'width': '100%',
-        'height': '100%',
-        'left': '0',
-        'top': '0',
-        'margin': '0',
-        'padding': '0',
-        'z-index': '700'
-      });
-      $('div#BookReader').css({
-        'height': '100%'
-      });
-
-      this.resize();
-  }
-
   
   /**
    * Window resize event callback, handles admin menu

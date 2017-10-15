@@ -789,12 +789,13 @@
         'height': '100%',
         'left': '0',
         'top': '0',
-        'z-index': '700'
+        'margin': '0',
+        'padding': '0',
+        'z-index': '1'
       });
       $('div#BookReader').css({
         'height': '100%'
       });
-
       this.resize();
   }
 

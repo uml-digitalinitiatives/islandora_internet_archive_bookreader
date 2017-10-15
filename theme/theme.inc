@@ -56,6 +56,19 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
     ),
   );
 
+/**
+ *      IABR enhanced for mobile
+ */
+  $metamobile = array(
+    '#tag' => 'meta',
+    '#attributes' => array(
+       'name' => 'viewport',
+       'content' => 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no',
+    ),
+  );
+  drupal_add_html_head($metamobile, 'metamobile');  
+  
+  
   drupal_add_js($data_array, 'setting');
   drupal_add_css("$library_path/BookReader/BookReader.css", array(
     'group' => CSS_SYSTEM,

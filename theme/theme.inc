@@ -19,17 +19,46 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
   $search_uri = module_exists('islandora_solr') ? url("internet_archive_bookreader_search/{$object->id}/TERM", array('absolute' => TRUE)) : NULL;
   $backup_uris = variable_get('islandora_internet_archive_bookreader_use_backup_dsid', FALSE);
 
+        //@ToDO
+        //move these settings to IABR admin form
+        //
+        //maybe better derive dinamically max width ?!? (ie. for thumbnails)
+        $image_max_width = 800;
+        //
+        //djatoka or iiif
+        $imageServer = 'iiif';
+//        $imageServer = 'djatoka';
+        //
+        $iiifServerBaseURL = 'http://v2p2arch.to.cnr.it/iiif-server/iiif/2';
+        //
+        //with or without token
+        $enableToken = false;
+//        $enableToken = true;
+        //
+        //tile source URL, must exists JP2 datastream
+        //ie. * http://127.0.0.1:8080/fedora/objects/v2p2text%3A107/datastreams/JP2/content
+        //      direct from fedora on the same server than iiif/djatoka
+        //    * http://123.123.123.123:8080/fedora/objects/v2p2text%3A107/datastreams/JP2/content
+        //      direct from fedora on different server than iiif/djatoka
+        //    * http://v2p2arch.to.cnr.it/islandora/object/v2p2text%3A107/datastream/JP2/view
+        //      from Islandora with reverse proxy to fedora
+        //
+        // URL=prefix + PID + suffix
+        $tilesourceURL_prefix = 'http://150.145.48.37:8080/fedora/objects/';
+        $tilesourceURL_suffix = '/datastreams/JP2/content';
+//        $tilesourceURL_prefix = 'http://v2p2arch.to.cnr.it/islandora/object/';
+//        $tilesourceURL_suffix = '/datastream/JP2/view';  
+  
   $pages = array();
   foreach ($variables['pages'] as $page_pid => $info) {
-    $addendum = $backup_uris ? array('pid' => $page_pid) : array(
-      'uri' => url("islandora/object/{$page_pid}/datastream/{$dsid}/view", array(
-        'absolute' => TRUE,
-        'query' => array(
-          'token' => islandora_get_object_token($page_pid, $dsid, 2),
-        ),
-      )),
-    );
-    $pages[] = $info + $addendum;
+        if ($backup_uris) {
+                $addendum = array('pid' => $page_pid);
+        }
+        else {
+                $object_token = $enableToken ? '?token='.islandora_get_object_token($page_pid, $dsid, 2) : '';
+                $addendum = array('uri' => $tilesourceURL_prefix.$page_pid.$tilesourceURL_suffix.$object_token);
+        }
+        $pages[] = $info + $addendum;
   }
 
   global $base_url;
@@ -53,6 +82,10 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
       'mobilize' => variable_get('islandora_internet_archive_bookreader_mobile_full_screen', FALSE),
       'content_type' => variable_get('islandora_internet_archive_bookreader_content_type', 'book'),
       'useBackupUri' => $backup_uris,
+
+	      'iiifUri' => $iiifServerBaseURL,
+        'image_max_width' => $image_max_width,
+        'imageServer' => $imageServer,
     ),
   );
 

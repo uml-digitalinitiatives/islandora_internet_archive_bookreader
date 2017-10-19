@@ -456,24 +456,35 @@
    * @return string
    *   The Djatoka URI for the given resource URI.
    */
-  IslandoraBookReader.prototype.getDjatokaUri = function(resource_uri) {
-    var base_uri = this.settings.djatokaUri;
-    //Do some sanitation on that base uri.
-    //Since it comes from an admin form, let's make sure there's a '/' at the
-    //end of it.
-    if (base_uri.charAt(base_uri.length) != '/') {
-      base_uri += '/';
-    }
-    var params = $.param({
-      'rft_id': resource_uri,
-      'url_ver': 'Z39.88-2004',
-      'svc_id': 'info:lanl-repo/svc/getRegion',
-      'svc_val_fmt': 'info:ofi/fmt:kev:mtx:jpeg2000',
-      'svc.format': 'image/jpeg',
-      'svc.level': this.settings.compression,
-      'svc.rotate': 0
-    });
-    return (base_uri + 'resolver?' + params);
+  IslandoraBookReader.prototype.getImageserverUri = function(resource_uri) {
+        if (this.settings.imageServer == 'iiif') {
+                var base_uri = this.settings.iiifUri;
+                if (base_uri.charAt(base_uri.length) != '/') {
+                        base_uri += '/';
+                }
+                var params = '/full/' + this.settings.image_max_width + ',/0/default.jpg';
+                return (base_uri + encodeURIComponent(resource_uri) + params);
+        }
+        else {
+
+                var base_uri = this.settings.djatokaUri;
+                //Do some sanitation on that base uri.
+                //Since it comes from an admin form, let's make sure there's a '/' at the
+                //end of it.
+                if (base_uri.charAt(base_uri.length) != '/') {
+                        base_uri += '/';
+                }
+                var params = $.param({
+                  'rft_id': resource_uri,
+                  'url_ver': 'Z39.88-2004',
+                  'svc_id': 'info:lanl-repo/svc/getRegion',
+                  'svc_val_fmt': 'info:ofi/fmt:kev:mtx:jpeg2000',
+                  'svc.format': 'image/jpeg',
+                  'svc.level': this.settings.compression,
+                  'svc.rotate': 0
+                });
+                return (base_uri + 'resolver?' + params);
+        }
   };
 
   /**
@@ -515,13 +526,13 @@
           }
         });
         if (callback_uri.indexOf("datastream/JP2/view") != -1) {
-          return this.getDjatokaUri(callback_uri);
+          return this.getImageserverUri(callback_uri);
         }
         return callback_uri;
       }
       // Not using backups? Just Djatoka-ize the page's image URI.
       else {
-        return this.getDjatokaUri(this.settings.pages[index].uri);
+        return this.getImageserverUri(this.settings.pages[index].uri);
       }
     }
   }

@@ -462,7 +462,15 @@
                 if (base_uri.charAt(base_uri.length) != '/') {
                         base_uri += '/';
                 }
-                var params = '/full/' + this.settings.image_max_width + ',/0/default.jpg';
+                // image width smaller if thumbnail view
+                // ToDO check if for 1/2 page view a better width is available
+                if (this.mode == 3) {
+                        var tile_width = this.thumbWidth;
+                }else {
+                        var tile_width = this.settings.image_max_width;
+                }
+                var params = '/full/' + tile_width + ',/0/default.jpg';
+		
                 return (base_uri + encodeURIComponent(resource_uri) + params);
         }
         else {

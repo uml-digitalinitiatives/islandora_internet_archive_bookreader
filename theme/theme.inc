@@ -182,12 +182,22 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
 function theme_islandora_internet_archive_bookreader_book_info(array $variables) {
   module_load_include('inc', 'islandora', 'includes/metadata');
 
+        //--ToDO: add to admin form
+        //--Name of Views or empty for default info tab
+        $infoTab_views = variable_get('islandora_internet_archive_bookreader_info_views', '');
+        //--to test
+        $infoTab_views = 'bookreader_info_tab';
+	
   $object = $variables['object'];
 
   // As IAV presents the metadata within a Colorbox window request for the
   // metadata in printable form.
   $metadata = islandora_retrieve_metadata_markup($object, TRUE);
   $viewer = variable_get('islandora_metadata_display', 'dublin_core');
+
+  //--info_views empty = default
+  if ($infoTab_views ==''){
+	
   // Let's default back to what IAV had before for a default.
   if ($viewer != 'dublin_core' && $metadata) {
     $content = $metadata;
@@ -208,6 +218,16 @@ function theme_islandora_internet_archive_bookreader_book_info(array $variables)
       'rows' => $rows,
       'sticky' => FALSE));
   }
+
+  }
+  //--info_views not empty = use Views (PID passed to views as contextual variable)
+  else {
+    $args = array($object->id);
+    $view = views_get_view($infoTab_views);
+    $content=$view->preview('default', $args);
+  }
+	  
+	  
   return $content;
 }
 

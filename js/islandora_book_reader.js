@@ -465,9 +465,11 @@
                 // image width smaller if thumbnail view
                 // ToDO check if for 1/2 page view a better width is available
                 if (this.mode == 3) {
-                        var tile_width = this.thumbWidth;
-                }else {
-                        var tile_width = this.settings.image_max_width;
+	     		// var tile_width = this.thumbWidth;
+			//fixed width better to avoid multiple redrawing (?)
+			var tile_width = Math.ceil(this.settings.image_max_width/2);
+		}else {
+                        var tile_width = Math.ceil(this.settings.image_max_width);
                 }
                 var params = '/full/' + tile_width + ',/0/default.jpg';
 		

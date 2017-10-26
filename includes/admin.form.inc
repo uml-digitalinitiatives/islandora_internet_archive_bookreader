@@ -98,6 +98,12 @@ function islandora_internet_archive_bookreader_admin_settings_form(array $form, 
        '#default_value' => variable_get('islandora_internet_archive_bookreader_use_token', FALSE),
      ),
     ),
+    'islandora_internet_archive_bookreader_info_views' => array(
+      '#type' => 'textfield',
+      '#title' => t('Views to render into Info tab'),
+      '#description' => t('Machine name of Views used to fill Info tab. Left empty to use standard metadata.'),
+      '#default_value' => variable_get('islandora_internet_archive_bookreader_info_views', ''),
+    ),    
     'islandora_internet_archive_bookreader_ocr_filter_field' => array(
       '#access' => $solr_enabled,
       '#type' => 'textfield',

@@ -24,6 +24,7 @@ function islandora_internet_archive_bookreader_uninstall() {
     'islandora_internet_archive_bookreader_tile_url_prefix',
     'islandora_internet_archive_bookreader_tile_url_suffix',
     'islandora_internet_archive_bookreader_use_token',
+    'islandora_internet_archive_bookreader_info_views',    
   );
   // Delete the Drupal variables defined by this module.
   array_walk($variables, 'variable_del');

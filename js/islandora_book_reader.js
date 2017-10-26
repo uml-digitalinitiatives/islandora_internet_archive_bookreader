@@ -451,11 +451,11 @@
    * in blankInfoDiv and blankShareDiv. Could be better than with override?
    */
 
-BookReader.prototype.blankInfoDiv = function() {
+IslandoraBookReader.prototype.blankInfoDiv = function() {
     return $([
         '<div class="BRfloat" id="BRinfo">',
             '<div class="BRfloatHead">About this book',
-                '<button class="floatShut" href="javascript:;" onclick="$.fn.colorbox.close();"><span class="shift">Close</span></a>',
+                '<button class="floatShut" href="javascript:;" onclick="parent.jQuery.colorbox.close();"><span class="shift">Close</span></a>',
             '</div>',
             '<div class="BRfloatBody">',
                 '<div class="BRfloatCover">',
@@ -473,12 +473,12 @@ BookReader.prototype.blankInfoDiv = function() {
     );
 }
 
-BookReader.prototype.blankShareDiv = function() {
+IslandoraBookReader.prototype.blankShareDiv = function() {
     return $([
         '<div class="BRfloat" id="BRshare">',
             '<div class="BRfloatHead">',
                 'Share',
-                '<button class="floatShut" href="javascript:;" onclick="$.fn.colorbox.close();"><span class="shift">Close</span></a>',
+                '<button class="floatShut" href="javascript:;" onclick="parent.jQuery.colorbox.close();"><span class="shift">Close</span></a>',
             '</div>',
         '</div>'].join('\n')
     );

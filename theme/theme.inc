@@ -157,12 +157,8 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
  */
 function theme_islandora_internet_archive_bookreader_book_info(array $variables) {
   module_load_include('inc', 'islandora', 'includes/metadata');
-
-        //--ToDO: add to admin form
-        //--Name of Views or empty for default info tab
-        $infoTab_views = variable_get('islandora_internet_archive_bookreader_info_views', '');
-        //--to test
-        $infoTab_views = 'bookreader_info_tab';
+  //--Name of Views or empty for default info tab
+  $infoTab_views = variable_get('islandora_internet_archive_bookreader_info_views', '');
 	
   $object = $variables['object'];
 

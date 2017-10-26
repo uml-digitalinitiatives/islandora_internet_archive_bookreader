@@ -14,7 +14,7 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
   $object = $variables['object'];
   $dsid = $variables['datastream_id'];
   $library_path = libraries_get_path('bookreader');
-  $colorbox_path = libraries_get_path('colorbox');
+//  $colorbox_path = libraries_get_path('colorbox');
   $module_path = drupal_get_path('module', 'islandora_internet_archive_bookreader');
   $search_uri = module_exists('islandora_solr') ? url("internet_archive_bookreader_search/{$object->id}/TERM", array('absolute' => TRUE)) : NULL;
   $backup_uris = variable_get('islandora_internet_archive_bookreader_use_backup_dsid', FALSE);

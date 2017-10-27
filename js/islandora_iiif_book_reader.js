@@ -102,6 +102,13 @@
      *   The URI
      */
     IslandoraIiifBookReader.prototype.getPageURI = function(index, reduce, rotate) {
+        if (typeof(reduce) === 'undefined') {
+            reduce = 1;
+        }
+        if (typeof(rotate) === 'undefined') {
+            rotate = 0;
+        }
+
         var page = this.getPage(index);
         if (typeof page !== 'undefined' && typeof page.identifier !== 'undefined') {
             return this.settings.iiifUri + '/' + page.identifier + '/full/pct:' + (1.0 / reduce * 100).toFixed(0) + '/' + rotate + '/default.jpg';

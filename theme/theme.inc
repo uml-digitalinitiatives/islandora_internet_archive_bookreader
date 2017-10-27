@@ -46,7 +46,7 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
   }
   elseif ($page_source == 'iiif') {
     $identifier_string = variable_get('islandora_internet_archive_bookreader_iiif_identifier', '[islandora_iareader:url_token]');
-    $iiifUrl = file_create_url(rtrim(variable_get('islandora_internet_archive_bookreader_iiif_url', 'ifff'),'/'));
+    $iiif_url = file_create_url(rtrim(variable_get('islandora_internet_archive_bookreader_iiif_url', 'ifff'), '/'));
     $pages = array();
     foreach ($variables['pages'] as $page_pid => $info) {
       $page_info = array(
@@ -58,10 +58,10 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
       $pages[] = $info + $page_info + array('identifier' => urlencode($identifier));
     }
     $page_source_settings = array(
-      'iiifUri' => $iiifUrl,
+      'iiifUri' => $iiif_url,
       'pages' => $pages,
       'pageCount' => count($pages),
-      'tokenHeader' => (bool)variable_get('islandora_internet_archive_bookreader_iiif_token_header', FALSE),
+      'tokenHeader' => (bool) variable_get('islandora_internet_archive_bookreader_iiif_token_header', FALSE),
     );
   }
 

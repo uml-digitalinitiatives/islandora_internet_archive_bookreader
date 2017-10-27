@@ -206,7 +206,7 @@ function islandora_internet_archive_bookreader_tokens($type, $tokens, array $dat
   $dsid = $data['islandora_iareader']['dsid'];
   $token = $data['islandora_iareader']['token'];
 
-  foreach($tokens as $name => $original) {
+  foreach ($tokens as $name => $original) {
     if ($name == 'pid') {
       $replacements[$original] = $pid;
     }

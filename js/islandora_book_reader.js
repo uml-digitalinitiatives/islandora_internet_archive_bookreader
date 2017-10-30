@@ -496,24 +496,29 @@ IslandoraBookReader.prototype.blankShareDiv = function() {
    * @return string
    *   The Djatoka URI for the given resource URI.
    */
-  IslandoraBookReader.prototype.getImageserverUri = function(resource_uri) {
+  IslandoraBookReader.prototype.getImageserverUri = function(resource_uri, reduce, rotate) {
         if (this.settings.imageServer == 'iiif') {
-                var base_uri = this.settings.iiifUri;
-                if (base_uri.charAt(base_uri.length) != '/') {
-                        base_uri += '/';
-                }
-                // image width smaller if thumbnail view
-                // ToDO check if for 1/2 page view a better width is available
+           var base_uri = this.settings.iiifUri;
+           if (base_uri.charAt(base_uri.length) != '/') {
+                base_uri += '/';
+           }
+
+           // image_max_width > 0 => fixed width / thumb = 1/2
+	   // image_max_width = 0 => automatic variable width depends on reduce parameter
+
+           if (this.settings.image_max_width > 0) {
+
                 if (this.mode == 3) {
-	     		// var tile_width = this.thumbWidth;
-			//fixed width better to avoid multiple redrawing (?)
-			var tile_width = Math.ceil(this.settings.image_max_width/2);
-		}else {
+                        var tile_width = Math.ceil(this.settings.image_max_width/2);
+                }else {
                         var tile_width = Math.ceil(this.settings.image_max_width);
                 }
                 var params = '/full/' + tile_width + ',/0/default.jpg';
-		
-                return (base_uri + encodeURIComponent(resource_uri) + params);
+           }
+           else {
+                var params = '/full/pct:' + (1.0 / reduce * 100).toFixed(0) + '/0/default.jpg';
+           }
+           return (base_uri + encodeURIComponent(resource_uri) + params);
         }
         else {
 
@@ -576,13 +581,13 @@ IslandoraBookReader.prototype.blankShareDiv = function() {
           }
         });
         if (callback_uri.indexOf("datastream/JP2/view") != -1) {
-          return this.getImageserverUri(callback_uri);
+          return this.getImageserverUri(callback_uri, reduce, rotate);
         }
         return callback_uri;
       }
       // Not using backups? Just Djatoka-ize the page's image URI.
       else {
-        return this.getImageserverUri(this.settings.pages[index].uri);
+        return this.getImageserverUri(this.settings.pages[index].uri, reduce, rotate);
       }
     }
   }

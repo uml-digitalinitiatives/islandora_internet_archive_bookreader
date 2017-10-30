@@ -69,7 +69,7 @@ function islandora_internet_archive_bookreader_admin_settings_form(array $form, 
       'islandora_internet_archive_bookreader_image_max_width' => array(
       '#type' => 'textfield',
       '#title' => t('IIIF image max width'),
-      '#description' => t('The max width in pixel IIIF will use when creating images (usually set at 800).'),
+      '#description' => t('The max width in pixel IIIF will use when creating images (usually set at 800). Set to 0 to enable automatic variable width.'),
       '#element_validate' => array('element_validate_number'),
       '#default_value' => $get_default_value('islandora_internet_archive_bookreader_image_max_width', '800'),
       ),

@@ -69,7 +69,7 @@ function islandora_internet_archive_bookreader_admin_settings_form(array $form, 
         '#suffix' => '</div>',
         '#type' => 'textfield',
         '#title' => t('IIIF Image Server Base URL'),
-        '#default_value' => variable_get('islandora_internet_archive_bookreader_iiif_url', 'ifff'),
+        '#default_value' => variable_get('islandora_internet_archive_bookreader_iiif_url', 'iiif'),
         '#description' => t('The location of the IIIF Image Server.'),
       ),
       'islandora_internet_archive_bookreader_iiif_token_header' => array(

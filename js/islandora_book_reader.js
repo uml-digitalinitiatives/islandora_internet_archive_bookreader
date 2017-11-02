@@ -571,7 +571,7 @@ IslandoraBookReader.prototype.blankShareDiv = function() {
     if (typeof this.settings.pages[index] != 'undefined') {
       // Using backups? Get the image URI via callback and determine whether to
       // Djatoka-ize it.
-      if (this.settings.useBackupUri == true) {
+      if ((this.settings.imageServer == 'djatoka') && (this.settings.useBackupUri == true)) {
         var callback_uri = null;
         $.ajax({
           url: this.settings.tokenUri.replace('PID', this.settings.pages[index].pid),

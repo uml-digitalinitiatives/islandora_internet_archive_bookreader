@@ -28,7 +28,7 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
 	
   $pages = array();
   foreach ($variables['pages'] as $page_pid => $info) {
-        if ($backup_uris) {
+        if (($backup_uris) && ($imageServer == 'djatoka')) {
                 $addendum = array('pid' => $page_pid);
         }
         else {

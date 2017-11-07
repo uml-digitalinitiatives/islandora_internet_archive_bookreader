@@ -127,7 +127,10 @@
     IslandoraIiifBookReader.prototype.getAjaxHeaders = function(index) {
         var page = this.getPage(index);
         if (this.settings.tokenHeader === true && this.loadWithAjax === true) {
-            return {'X-ISLANDORA-TOKEN' : page.token};
+            if (typeof(page) !== 'undefined' && typeof(page.token) !== 'undefined') {
+                return {'X-ISLANDORA-TOKEN' : page.token};
+            }
         }
+        return {};
     };
 })(jQuery);

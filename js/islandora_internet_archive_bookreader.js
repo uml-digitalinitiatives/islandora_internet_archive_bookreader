@@ -15,14 +15,20 @@
         $(window).resize(function() {
           bookReader.windowResize();
         });
+      // to avoid overflow icon on the bottom right side
+      $('div#BRpage').css({
+        'width': '300px'
+      });
         // We currently don't support read-aloud.
         $('#BRtoolbar').find('.read').hide();
         if (!bookReader.searchEnabled()) {
           $('#textSrch').hide();
           $('#btnSrch').hide();
         }
+        // If mobile device and mobilize the force fullscreen and mode 1
         if ($.browser.mobile && settings.islandoraInternetArchiveBookReader.mobilize) {
           bookReader.goFullScreen();
+          bookReader.switchMode(1);
         }
       });
     }

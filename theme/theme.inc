@@ -14,22 +14,28 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
   $object = $variables['object'];
   $dsid = $variables['datastream_id'];
   $library_path = libraries_get_path('bookreader');
-  $colorbox_path = libraries_get_path('colorbox');
+//  $colorbox_path = libraries_get_path('colorbox');
   $module_path = drupal_get_path('module', 'islandora_internet_archive_bookreader');
   $search_uri = module_exists('islandora_solr') ? url("internet_archive_bookreader_search/{$object->id}/TERM", array('absolute' => TRUE)) : NULL;
   $backup_uris = variable_get('islandora_internet_archive_bookreader_use_backup_dsid', FALSE);
 
+  $image_max_width = variable_get('islandora_internet_archive_bookreader_image_max_width', '800');
+  $imageServer = variable_get('islandora_internet_archive_bookreader_imageserver', 'djatoka');
+  $iiifServerBaseURL = variable_get('islandora_internet_archive_bookreader_iiif_url', 'iiif/2');
+  $enableToken = variable_get('islandora_internet_archive_bookreader_use_token', FALSE);
+  $tilesourceURL_prefix = variable_get('islandora_internet_archive_bookreader_tile_url_prefix', 'http://127.0.0.1:8080/fedora/objects/');
+  $tilesourceURL_suffix = variable_get('islandora_internet_archive_bookreader_tile_url_suffix', '/datastreams/JP2/content');
+	
   $pages = array();
   foreach ($variables['pages'] as $page_pid => $info) {
-    $addendum = $backup_uris ? array('pid' => $page_pid) : array(
-      'uri' => url("islandora/object/{$page_pid}/datastream/{$dsid}/view", array(
-        'absolute' => TRUE,
-        'query' => array(
-          'token' => islandora_get_object_token($page_pid, $dsid, 2),
-        ),
-      )),
-    );
-    $pages[] = $info + $addendum;
+        if (($backup_uris) && ($imageServer == 'djatoka')) {
+                $addendum = array('pid' => $page_pid);
+        }
+        else {
+                $object_token = $enableToken ? '?token='.islandora_get_object_token($page_pid, $dsid, 2) : '';
+                $addendum = array('uri' => $tilesourceURL_prefix.$page_pid.$tilesourceURL_suffix.$object_token);
+        }
+        $pages[] = $info + $addendum;
   }
 
   global $base_url;
@@ -53,9 +59,25 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
       'mobilize' => variable_get('islandora_internet_archive_bookreader_mobile_full_screen', FALSE),
       'content_type' => variable_get('islandora_internet_archive_bookreader_content_type', 'book'),
       'useBackupUri' => $backup_uris,
+      'iiifUri' => $iiifServerBaseURL,
+      'image_max_width' => $image_max_width,
+      'imageServer' => $imageServer,
     ),
   );
 
+/**
+ *      IABR enhanced for mobile
+ */
+  $metamobile = array(
+    '#tag' => 'meta',
+    '#attributes' => array(
+       'name' => 'viewport',
+       'content' => 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no',
+    ),
+  );
+  drupal_add_html_head($metamobile, 'metamobile');  
+  
+  
   drupal_add_js($data_array, 'setting');
   drupal_add_css("$library_path/BookReader/BookReader.css", array(
     'group' => CSS_SYSTEM,
@@ -135,13 +157,19 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
  */
 function theme_islandora_internet_archive_bookreader_book_info(array $variables) {
   module_load_include('inc', 'islandora', 'includes/metadata');
-
+  //--Name of Views or empty for default info tab
+  $infoTab_views = variable_get('islandora_internet_archive_bookreader_info_views', '');
+	
   $object = $variables['object'];
 
   // As IAV presents the metadata within a Colorbox window request for the
   // metadata in printable form.
   $metadata = islandora_retrieve_metadata_markup($object, TRUE);
   $viewer = variable_get('islandora_metadata_display', 'dublin_core');
+
+  //--info_views empty = default
+  if ($infoTab_views ==''){
+	
   // Let's default back to what IAV had before for a default.
   if ($viewer != 'dublin_core' && $metadata) {
     $content = $metadata;
@@ -162,6 +190,16 @@ function theme_islandora_internet_archive_bookreader_book_info(array $variables)
       'rows' => $rows,
       'sticky' => FALSE));
   }
+
+  }
+  //--info_views not empty = use Views (PID passed to views as contextual variable)
+  else {
+    $args = array($object->id);
+    $view = views_get_view($infoTab_views);
+    $content=$view->preview('default', $args);
+  }
+	  
+	  
   return $content;
 }
 

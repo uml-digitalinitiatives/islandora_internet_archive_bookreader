@@ -163,6 +163,99 @@
     return this.settings.searchUri != null;
   }
 
+/**
+ *
+ * Overrided here to enable fullscreen button, maybe a better metod to do it
+ *
+ * This method builds the html for the toolbar. It can be decorated to extend
+ * the toolbar.
+ * @return {jqueryElement}
+ */
+  IslandoraBookReader.prototype.buildToolbarElement = function() {
+  // $$$mang should be contained within the BookReader div instead of body
+  var readIcon = '';
+  if (this.isSoundManagerSupported) {
+      readIcon = "<button class='BRicon read modal js-tooltip'></button>";
+  }
+
+  var escapedTitle = BookReader.util.escapeHTML(this.bookTitle);
+
+  var mobileClass = '';
+  if (this.enableMobileNav) {
+    mobileClass = 'responsive';
+  }
+
+  var desktopSearchHtml = '';
+  if (this.enableSearch) {
+      desktopSearchHtml = "<span class='BRtoolbarSection BRtoolbarSectionSearch tc ph20 last'>"
+      +         "<form class='booksearch desktop'>"
+      +           "<input type='search' class='textSrch form-control' name='textSrch' val='' placeholder='Search inside this book'/>"
+      +           "<button type='submit' id='btnSrch' name='btnSrch'>"
+      +              "<img src=\""+this.imagesBaseURL+"icon_search_button.svg\" />"
+      +           "</button>"
+      +         "</form>"
+      +       "</span>";
+  }
+
+  // Add large screen navigation
+  return $(
+    "<div id='BRtoolbar' class='header fixed "+mobileClass+"'>"
+    +   "<span class='BRmobileHamburgerWrapper'>"
+    +     "<span class=\"hamburger\"><a href=\"#BRmobileMenu\"></a></span>"
+    +     "<span class=\"BRtoolbarMobileTitle\" title=\""+escapedTitle+"\">" + this.bookTitle + "</span>"
+    +   "</span>"
+    +   "<span id='BRtoolbarbuttons' >"
+    +     "<span class='BRtoolbarLeft'>"
+    +       "<span class='BRtoolbarSection BRtoolbarSectionLogo tc'>"
+    +         "<a class='logo' href='" + this.logoURL + "'></a>"
+    +       "</span>"
+
+    +       "<span class='BRtoolbarSection BRtoolbarSectionTitle title tl ph10 last'>"
+    +           "<span id='BRreturn'><a></a></span>"
+    +           "<div id='BRnavCntlTop' class='BRnabrbuvCntl'></div>"
+    +       "</span>"
+    +    "</span>"
+
+    +     "<span class='BRtoolbarRight'>"
+
+    +       "<span class='BRtoolbarSection BRtoolbarSectionInfo tc ph10'>"
+    +         "<button class='BRicon info js-tooltip'></button>"
+    +         "<button class='BRicon share js-tooltip'></button>"
+    +         readIcon
+    +       "</span>"
+
+    // zoom
+    +       "<span class='BRtoolbarSection BRtoolbarSectionZoom tc ph10'>"
+    +         "<button class='BRicon zoom_out js-tooltip'></button>"
+    +         "<button class='BRicon zoom_in js-tooltip'></button>"
+    +       "</span>"
+
+    // Search
+    + desktopSearchHtml
+
+    // enable fullscreen button
+    +     "<button class='BRicon full'></button>"
+
+    +     "</span>" // end BRtoolbarRight
+
+    +   "</span>" // end desktop-only
+
+    + "</div>"
+    /*
+    + "<div id='BRzoomer'>"
+    +   "<div id='BRzoompos'>"
+    +     "<button class='BRicon zoom_out'></button>"
+    +     "<div id='BRzoomcontrol'>"
+    +       "<div id='BRzoomstrip'></div>"
+    +       "<div id='BRzoombtn'></div>"
+    +     "</div>"
+    +     "<button class='BRicon zoom_in'></button>"
+    +   "</div>"
+    + "</div>"
+    */
+    );
+}
+  
   /**
    * Islandora version of initToolbar function
    *
@@ -273,7 +366,14 @@
           }
       });
       jToolbar.find('.info').colorbox({inline: true, opacity: "0.5", href: "#BRinfo", onLoad: function() { self.autoStop(); self.ttsStop(); } });
-
+      jToolbar.find('.full').bind('click', function() {
+        self.toggleFullScreen();
+      });
+      $(window).keyup(function(e) {
+        if(e.keyCode == 27 && self.fullscreen) {
+          self.toggleFullScreen();
+        }
+      });
       $('<div style="display: none;"></div>').append(
         this.blankShareDiv()
       ).append(
@@ -335,8 +435,57 @@
       }
   }
 
+  /**
+   * @param JInfoDiv DOM element. Appends info to this element
+   * Can be overridden or extended
+   */
+  IslandoraBookReader.prototype.buildInfoDiv = function(jInfoDiv) {
+      // Remove these legacy elements
+      jInfoDiv.find('.BRfloatBody, .BRfloatCover, .BRfloatFoot').remove();
 
+      $(this.settings.info).appendTo(jInfoDiv);
+  }
 
+  /**
+   * override $.fn.colorbox.close() with parent.jQuery.colorbox.close()
+   * in blankInfoDiv and blankShareDiv. Could be better than with override?
+   */
+
+IslandoraBookReader.prototype.blankInfoDiv = function() {
+    return $([
+        '<div class="BRfloat" id="BRinfo">',
+            '<div class="BRfloatHead">About this book',
+                '<button class="floatShut" href="javascript:;" onclick="parent.jQuery.colorbox.close();"><span class="shift">Close</span></a>',
+            '</div>',
+            '<div class="BRfloatBody">',
+                '<div class="BRfloatCover">',
+                '</div>',
+                '<div class="BRfloatMeta">',
+                    '<div class="BRfloatTitle">',
+                        '<h2><a/></h2>',
+                    '</div>',
+                '</div>',
+            '</div>',
+            '<div class="BRfloatFoot">',
+                '<a href="https://openlibrary.org/dev/docs/bookreader">About the BookReader</a>',
+            '</div>',
+        '</div>'].join('\n')
+    );
+}
+
+IslandoraBookReader.prototype.blankShareDiv = function() {
+    return $([
+        '<div class="BRfloat" id="BRshare">',
+            '<div class="BRfloatHead">',
+                'Share',
+                '<button class="floatShut" href="javascript:;" onclick="parent.jQuery.colorbox.close();"><span class="shift">Close</span></a>',
+            '</div>',
+        '</div>'].join('\n')
+    );
+}
+  
+  
+  
 
   /**
    * Gets the Djatoka URI.
@@ -347,24 +496,50 @@
    * @return string
    *   The Djatoka URI for the given resource URI.
    */
-  IslandoraBookReader.prototype.getDjatokaUri = function(resource_uri) {
-    var base_uri = this.settings.djatokaUri;
-    //Do some sanitation on that base uri.
-    //Since it comes from an admin form, let's make sure there's a '/' at the
-    //end of it.
-    if (base_uri.charAt(base_uri.length) != '/') {
-      base_uri += '/';
-    }
-    var params = $.param({
-      'rft_id': resource_uri,
-      'url_ver': 'Z39.88-2004',
-      'svc_id': 'info:lanl-repo/svc/getRegion',
-      'svc_val_fmt': 'info:ofi/fmt:kev:mtx:jpeg2000',
-      'svc.format': 'image/jpeg',
-      'svc.level': this.settings.compression,
-      'svc.rotate': 0
-    });
-    return (base_uri + 'resolver?' + params);
+  IslandoraBookReader.prototype.getImageserverUri = function(resource_uri, reduce, rotate) {
+        if (this.settings.imageServer == 'iiif') {
+           var base_uri = this.settings.iiifUri;
+           if (base_uri.charAt(base_uri.length) != '/') {
+                base_uri += '/';
+           }
+
+           // image_max_width > 0 => fixed width / thumb = 1/2
+	   // image_max_width = 0 => automatic variable width depends on reduce parameter
+
+           if (this.settings.image_max_width > 0) {
+
+                if (this.mode == 3) {
+                        var tile_width = Math.ceil(this.settings.image_max_width/2);
+                }else {
+                        var tile_width = Math.ceil(this.settings.image_max_width);
+                }
+                var params = '/full/' + tile_width + ',/0/default.jpg';
+           }
+           else {
+                var params = '/full/pct:' + (1.0 / reduce * 100).toFixed(0) + '/0/default.jpg';
+           }
+           return (base_uri + encodeURIComponent(resource_uri) + params);
+        }
+        else {
+
+                var base_uri = this.settings.djatokaUri;
+                //Do some sanitation on that base uri.
+                //Since it comes from an admin form, let's make sure there's a '/' at the
+                //end of it.
+                if (base_uri.charAt(base_uri.length) != '/') {
+                        base_uri += '/';
+                }
+                var params = $.param({
+                  'rft_id': resource_uri,
+                  'url_ver': 'Z39.88-2004',
+                  'svc_id': 'info:lanl-repo/svc/getRegion',
+                  'svc_val_fmt': 'info:ofi/fmt:kev:mtx:jpeg2000',
+                  'svc.format': 'image/jpeg',
+                  'svc.level': this.settings.compression,
+                  'svc.rotate': 0
+                });
+                return (base_uri + 'resolver?' + params);
+        }
   };
 
   /**
@@ -396,7 +571,7 @@
     if (typeof this.settings.pages[index] != 'undefined') {
       // Using backups? Get the image URI via callback and determine whether to
       // Djatoka-ize it.
-      if (this.settings.useBackupUri == true) {
+      if ((this.settings.imageServer == 'djatoka') && (this.settings.useBackupUri == true)) {
         var callback_uri = null;
         $.ajax({
           url: this.settings.tokenUri.replace('PID', this.settings.pages[index].pid),
@@ -406,13 +581,13 @@
           }
         });
         if (callback_uri.indexOf("datastream/JP2/view") != -1) {
-          return this.getDjatokaUri(callback_uri);
+          return this.getImageserverUri(callback_uri, reduce, rotate);
         }
         return callback_uri;
       }
       // Not using backups? Just Djatoka-ize the page's image URI.
       else {
-        return this.getDjatokaUri(this.settings.pages[index].uri);
+        return this.getImageserverUri(this.settings.pages[index].uri, reduce, rotate);
       }
     }
   }
@@ -634,7 +809,63 @@
       }
     }
   }
+ 
+  /**
+   * Toggle fullscreen viewer.
+   */
+  IslandoraBookReader.prototype.toggleFullScreen = function() {
+    this.fullscreen = (this.fullscreen ? false : true);
+    if(this.fullscreen) {
+      $('div#book-viewer').css({
+        'position': 'fixed',
+        'width': '100%',
+        'height': '100%',
+        'left': '0',
+        'top': '0',
+        'z-index': '700'
+      });
+      $('div#BookReader').css({
+        'height': '100%'
+      });
 
+      this.resize();
+    }
+    else {
+
+      $('div#book-viewer').css({
+      'position': 'relative',
+      'z-index': '0'
+      });
+      $('div#BookReader').css({
+        'height': ''
+      });
+
+      this.resize();
+    }
+  }
+
+  /**
+   * Go Fullscreen regardless of current state.
+   */
+  IslandoraBookReader.prototype.goFullScreen = function() {
+    this.fullscreen = true;
+      $('div#book-viewer').css({
+        'position': 'fixed',
+        'width': '100%',
+        'height': '100%',
+        'left': '0',
+        'top': '0',
+        'margin': '0',
+        'padding': '0',
+        'z-index': '1'
+      });
+      $('div#BookReader').css({
+        'height': '100%'
+      });
+      this.resize();
+  }
+
+  
   /**
    * Window resize event callback, handles admin menu
    * in Drupal.

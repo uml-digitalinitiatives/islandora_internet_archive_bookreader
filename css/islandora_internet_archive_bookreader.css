@@ -33,20 +33,39 @@ div#BRcontainer {
 div#BRpageview {
   background-color: #ccc;
 }
-
+/*
 div#BRfulltext .BRfloat {
   min-width: 385px;
 }
 div#BRfulltext .BRfloatMeta {
   overflow: auto;
   height: auto !important;
-  /* Prevents hiding text. */
+  *//* Prevents hiding text. *//*
   max-height: 600px;
 }
 div.BRfloatHead {
   background-color: #ccc !important;
   padding: 10px 10px 15px;
 }
+*/
+/* fulltext */
+button.BRtext, #BRtoolbar button.BRtext {
+  font-size:14px;
+  height: 32px;
+  background-color: transparent;
+  color: rgb(122,122,122);
+  text-decoration: none;
+  margin: 8px;
+  border: 0px;
+}
+button.BRtext:hover, #BRtoolbar button.BRtext:hover {
+  background-color: #4A90E2;
+  color: white;
+}
+#BRfulltext.BRfloat {
+  min-width: 800px;
+}
+/**/
 a.floatShut {
   margin: 12px 10px;
 }
@@ -85,6 +104,7 @@ div.BRprogresspopup {
  * Used to handle conflict with the colorbox Drupal module
  * pertaining to the textarea
  */
+/*
 #colorbox {
   top: 335px !important;
 }
@@ -93,7 +113,7 @@ div.BRprogresspopup {
   height: 100% !important;
 }
 #cboxWrapper {
-  background: none; /* Used to eliminate white background */
+  background: none; *//* Used to eliminate white background *//*
 }
 #cboxWrapper table {
   margin-top: 1em;
@@ -103,9 +123,13 @@ div.BRprogresspopup {
   padding: 0.5em;
 }
 #cboxMiddleLeft {
-  height: 0 !important; /* Positions textarea correctly */
+  height: 0 !important; *//* Positions textarea correctly *//*
 }
-
+*/
+#cboxLoadedContent {
+        overflow-y: auto!important; /* to make fulltext scrollable */
+        margin: 5px;
+}
 
 /*
  * jquery.mmenu.css equivalent

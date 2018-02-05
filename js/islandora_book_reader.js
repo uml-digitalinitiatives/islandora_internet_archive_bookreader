@@ -218,6 +218,10 @@
 
     +     "<span class='BRtoolbarRight'>"
 
+    +       "<span class='BRtoolbarSection tc ph10'>"
+    +         "<button class='BRtext fulltext'><span class=\"hide-md\">Full text</span></button>"
+    +       "</span>"	  
+	  
     +       "<span class='BRtoolbarSection BRtoolbarSectionInfo tc ph10'>"
     +         "<button class='BRicon info js-tooltip'></button>"
     +         "<button class='BRicon share js-tooltip'></button>"
@@ -365,6 +369,10 @@
               $('.BRpageviewValue').val(window.location.href);
           }
       });
+      	jToolbar.find('.fulltext').colorbox({inline: true, opacity: "0.5", href: "#BRfulltext", onLoad: function() { 
+		self.autoStop(); self.ttsStop();
+		self.buildFulltextDiv($('#BRfulltext')); 
+	} });	  
       jToolbar.find('.info').colorbox({inline: true, opacity: "0.5", href: "#BRinfo", onLoad: function() { self.autoStop(); self.ttsStop(); } });
       jToolbar.find('.full').bind('click', function() {
         self.toggleFullScreen();
@@ -378,6 +386,8 @@
         this.blankShareDiv()
       ).append(
         this.blankInfoDiv()
+      ).append(
+        this.blankFulltextDiv()	      
       ).appendTo($('body'));
 
       $('#BRinfo .BRfloatTitle a').attr( {'href': this.bookUrl} ).text(this.bookTitle).addClass('title');
@@ -445,6 +455,61 @@
 
       $(this.settings.info).appendTo(jInfoDiv);
   }
+  
+  IslandoraBookReader.prototype.buildFulltextDiv = function(jFulltextDiv) {
+
+	// Remove these legacy elements
+        jFulltextDiv.find('.BRfloatBody, .BRfloatCover, .BRfloatFoot').remove();
+
+	// clear content
+        jFulltextDiv.find('.BRfloatMeta').remove();
+	jFulltextDiv.append($("<div class=\"BRfloatMeta\"></div>"));
+
+    	jFulltextDiv.find('.BRfloatMeta').height(600);
+    	jFulltextDiv.find('.BRfloatMeta').width(780);
+ 
+   	if (1 == this.mode) {
+	      	// Recent fix to correct issue with 2 page books
+	      	var hash_arr = this.oldLocationHash.split("/");
+	      	var index = hash_arr[1];
+	      	var pid = this.getPID(index-1);
+	      	$.get(this.getTextURI(pid),
+		    	function(data) {
+		        jFulltextDiv.find('.BRfloatMeta').html("<a href=\"/islandora/object/" + pid + "\" target=\"_blank\"><img src=\"/islandora/object/" 
+			+ pid + "/datastream/TN\" height=\"100\"></a><br><strong>Page " + index + "</strong><HR>" + data);
+		});
+    	} else if (3 == this.mode) {
+      		jFulltextDiv.find('.BRfloatMeta').html('<div><strong>' + Drupal.t('Full text not supported for this view.') + '</strong></div>');
+    	} else {
+	      	var twoPageText = $([
+	      		'<div class="textTop" style="font-size: 1.1em">',
+		 	'<div class="textLeft" style="padding: 10px"><p>Left page loading...</p></div>',
+		 	'<div class="textRight" style="padding: 10px"><p>Right page loading...</p></div>',
+	      		'</div>'].join('\n'));
+	      	jFulltextDiv.find('.BRfloatMeta').html(twoPageText);
+	      	var indices = this.getSpreadIndices(this.currentIndex());
+	      	var left_pid = this.getPID(indices[0]);
+	      	var right_pid = this.getPID(indices[1]);
+	      	if(left_pid) {
+			$.get(this.getTextURI(left_pid),
+		      		function(data) {
+		        	jFulltextDiv.find('.textLeft').html("<a href=\"/islandora/object/" + left_pid + "\" target=\"_blank\"><img src=\"/islandora/object/" 
+				+ left_pid + "/datastream/TN\" height=\"100\"></a><br><strong>Page " + (indices[0]+1) + "</strong><HR>" + data);
+		      	});
+	      	} else {
+			jFulltextDiv.find('.textLeft').html("<HR>");
+		}
+	      	if(right_pid) {
+			$.get(this.getTextURI(right_pid),
+		      		function(data) {
+		        	jFulltextDiv.find('.textRight').html("<a href=\"/islandora/object/" + right_pid + "\" target=\"_blank\"><img src=\"/islandora/object/" 
+				+ right_pid + "/datastream/TN\" height=\"100\" ></a><br><strong>Page " + (indices[1]+1) + "</strong><HR>" + data);
+		      	});
+	      	} else {
+		        jFulltextDiv.find('.textRight').html("<HR>");
+		}
+	}
+  }
 
   /**
    * override $.fn.colorbox.close() with parent.jQuery.colorbox.close()
@@ -484,8 +549,16 @@ IslandoraBookReader.prototype.blankShareDiv = function() {
     );
 }
   
-  
-  
+IslandoraBookReader.prototype.blankFulltextDiv = function() {
+    return $([
+        '<div class="BRfloat" id="BRfulltext">',
+            '<div class="BRfloatHead">',
+                'Full-text',
+                '<button class="floatShut" href="javascript:;" onclick="parent.jQuery.colorbox.close();"><span class="shift">Close</span></a>',
+            '</div>',
+        '</div>'].join('\n')
+    );
+}  
 
   /**
    * Gets the Djatoka URI.

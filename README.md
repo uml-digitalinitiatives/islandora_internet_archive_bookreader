@@ -16,7 +16,7 @@ This module requires the following modules/libraries:
 * [Islandora Solr Search](https://github.com/Islandora/islandora_solr_search/) (Optional)
 * [Libraries API](https://www.drupal.org/project/libraries)
 * [Colorbox](https://www.drupal.org/project/colorbox)
-
+* [Drupal Token Module](https://www.drupal.org/project/token)
 
 ## Installation
 
@@ -53,7 +53,7 @@ Having problems or solved a problem? Check out the Islandora google groups for a
 
 Current maintainers:
 
-* [Alan Stanley](https://github.com/ajstanley)
+* [Daniel Aitken](https://github.com/qadan)
 
 ## Development
 

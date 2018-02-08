@@ -8,7 +8,7 @@
 // JS loaded prior to this point in the bookreader requires jQuery 1.5, and further
 // execution requires jQuery 1.7 or higher.
 // TODO: Figure out what library is the culprit.
-Drupal.settings.islandoraInternetArchiveBookReader_jQuery = jQuery.noConflict(true);
+// Drupal.settings.islandoraInternetArchiveBookReader_jQuery = jQuery.noConflict(true);
 (function ($) {
   Drupal.behaviors.islandoraInternetArchiveBookReader = {
     attach: function(context, settings) {
@@ -26,14 +26,20 @@ Drupal.settings.islandoraInternetArchiveBookReader_jQuery = jQuery.noConflict(tr
         $(window).resize(function() {
           bookReader.windowResize();
         });
+      // to avoid overflow icon on the bottom right side
+      $('div#BRpage').css({
+        'width': '300px'
+      });
         // We currently don't support read-aloud.
         $('#BRtoolbar').find('.read').hide();
         if (!bookReader.searchEnabled()) {
           $('#textSrch').hide();
           $('#btnSrch').hide();
         }
+        // If mobile device and mobilize the force fullscreen and mode 1
         if ($.browser.mobile && settings.islandoraInternetArchiveBookReader.mobilize) {
           bookReader.goFullScreen();
+          bookReader.switchMode(1);
         }
       });
     }

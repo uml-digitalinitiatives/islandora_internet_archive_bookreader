@@ -96,6 +96,61 @@ function islandora_internet_archive_bookreader_admin_settings_form(array $form, 
         )),
       ),
     ),
+    'iiif' => array(
+      '#type' => 'fieldset',
+      '#title' => t('IIIF Image Server Settings'),
+      '#description' => t('Settings for IIIF Image Server'),
+      '#states' => array(
+        'visible' => array(
+          ':input[name="islandora_internet_archive_bookreader_imageserver"]' => array('value' => 'iiif'),
+        ),
+      ),
+      'islandora_internet_archive_bookreader_iiif_url' => array(
+        '#prefix' => '<div id="islandora-internet-archive-bookreader-iiif-path-wrapper">',
+        '#suffix' => '</div>',
+        '#type' => 'textfield',
+        '#title' => t('IIIF Image Server Base URL'),
+        '#default_value' => variable_get('islandora_internet_archive_bookreader_iiif_url', 'iiif/2'),
+        '#description' => t('The location of the IIIF Image Server.'),
+      ),
+      'islandora_internet_archive_bookreader_image_max_width' => array(
+      '#type' => 'textfield',
+      '#title' => t('IIIF image max width'),
+      '#description' => t('The max width in pixel IIIF will use when creating images (usually set at 800). Set to 0 to enable automatic variable width.'),
+      '#element_validate' => array('element_validate_number'),
+      '#default_value' => $get_default_value('islandora_internet_archive_bookreader_image_max_width', '800'),
+      ),
+    ),
+    'tilesource' => array(
+      '#type' => 'fieldset',
+      '#title' => t('Internet Archive BookReader Tile Source settings'),
+      '#description' => t('<p>These settings will apply to all tile sources globally.</p>'),
+
+     'islandora_internet_archive_bookreader_tile_url_prefix' => array(
+       '#type' => 'textfield',
+       '#title' => t('Tile source URL prefix'),
+       '#description' => t('Prefix to compose tile source URL (prefix + PID + suffix).'),
+       '#default_value' => variable_get('islandora_internet_archive_bookreader_tile_url_prefix', 'http://127.0.0.1:8080/fedora/objects/'),
+     ),
+     'islandora_internet_archive_bookreader_tile_url_suffix' => array(
+       '#type' => 'textfield',
+       '#title' => t('Tile source URL suffix'),
+       '#description' => t('Suffix to compose tile source URL (prefix + PID + suffix).'),
+       '#default_value' => variable_get('islandora_internet_archive_bookreader_tile_url_suffix', '/datastreams/JP2/content'),
+     ),
+     'islandora_internet_archive_bookreader_use_token' => array(
+       '#type' => 'checkbox',
+       '#title' => t('Enable token'),
+       '#description' => t('If enabled add auth token to tile source.'),
+       '#default_value' => variable_get('islandora_internet_archive_bookreader_use_token', FALSE),
+     ),
+    ),
+    'islandora_internet_archive_bookreader_info_views' => array(
+      '#type' => 'textfield',
+      '#title' => t('Views to render into Info tab'),
+      '#description' => t('Machine name of Views used to fill Info tab. Left empty to use standard metadata.'),
+      '#default_value' => variable_get('islandora_internet_archive_bookreader_info_views', ''),
+    ),    
     'islandora_internet_archive_bookreader_ocr_filter_field' => array(
       '#access' => $solr_enabled,
       '#type' => 'textfield',

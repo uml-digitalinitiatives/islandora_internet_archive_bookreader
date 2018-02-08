@@ -4,11 +4,6 @@
  * defined element.
  */
 
-// noConflict is here to allow for compatibility between jQuery 1.5 and jquery 1.7.
-// JS loaded prior to this point in the bookreader requires jQuery 1.5, and further
-// execution requires jQuery 1.7 or higher.
-// TODO: Figure out what library is the culprit.
-// Drupal.settings.islandoraInternetArchiveBookReader_jQuery = jQuery.noConflict(true);
 (function ($) {
   Drupal.behaviors.islandoraInternetArchiveBookReader = {
     attach: function(context, settings) {

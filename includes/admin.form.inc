@@ -121,30 +121,33 @@ function islandora_internet_archive_bookreader_admin_settings_form(array $form, 
       '#default_value' => $get_default_value('islandora_internet_archive_bookreader_image_max_width', '800'),
       ),
     ),
-    'tilesource' => array(
-      '#type' => 'fieldset',
-      '#title' => t('Internet Archive BookReader Tile Source settings'),
-      '#description' => t('<p>These settings will apply to all tile sources globally.</p>'),
-
-     'islandora_internet_archive_bookreader_tile_url_prefix' => array(
-       '#type' => 'textfield',
-       '#title' => t('Tile source URL prefix'),
-       '#description' => t('Prefix to compose tile source URL (prefix + PID + suffix).'),
-       '#default_value' => variable_get('islandora_internet_archive_bookreader_tile_url_prefix', 'http://127.0.0.1:8080/fedora/objects/'),
-     ),
-     'islandora_internet_archive_bookreader_tile_url_suffix' => array(
-       '#type' => 'textfield',
-       '#title' => t('Tile source URL suffix'),
-       '#description' => t('Suffix to compose tile source URL (prefix + PID + suffix).'),
-       '#default_value' => variable_get('islandora_internet_archive_bookreader_tile_url_suffix', '/datastreams/JP2/content'),
-     ),
-     'islandora_internet_archive_bookreader_use_token' => array(
-       '#type' => 'checkbox',
-       '#title' => t('Enable token'),
-       '#description' => t('If enabled add auth token to tile source.'),
-       '#default_value' => variable_get('islandora_internet_archive_bookreader_use_token', FALSE),
-     ),
-    ),
+// I do not know what the purpose of these tilesource settings is.
+// They are not currently being used.
+// TODO: Review this with Diego.
+//    'tilesource' => array(
+//      '#type' => 'fieldset',
+//      '#title' => t('Internet Archive BookReader Tile Source settings'),
+//      '#description' => t('<p>These settings will apply to all tile sources globally.</p>'),
+//
+//     'islandora_internet_archive_bookreader_tile_url_prefix' => array(
+//       '#type' => 'textfield',
+//       '#title' => t('Tile source URL prefix'),
+//       '#description' => t('Prefix to compose tile source URL (prefix + PID + suffix).'),
+//       '#default_value' => variable_get('islandora_internet_archive_bookreader_tile_url_prefix', 'http://127.0.0.1:8080/fedora/objects/'),
+//     ),
+//     'islandora_internet_archive_bookreader_tile_url_suffix' => array(
+//       '#type' => 'textfield',
+//       '#title' => t('Tile source URL suffix'),
+//       '#description' => t('Suffix to compose tile source URL (prefix + PID + suffix).'),
+//       '#default_value' => variable_get('islandora_internet_archive_bookreader_tile_url_suffix', '/datastreams/JP2/content'),
+//     ),
+//     'islandora_internet_archive_bookreader_use_token' => array(
+//       '#type' => 'checkbox',
+//       '#title' => t('Enable token'),
+//       '#description' => t('If enabled add auth token to tile source.'),
+//       '#default_value' => variable_get('islandora_internet_archive_bookreader_use_token', FALSE),
+//     ),
+//    ),
     'islandora_internet_archive_bookreader_info_views' => array(
       '#type' => 'textfield',
       '#title' => t('Views to render into Info tab'),

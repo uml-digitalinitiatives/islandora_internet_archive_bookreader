@@ -43,23 +43,6 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
       'pageCount' => count($pages),
       'useBackupUri' => $backup_uris,
     );
-//    $image_max_width = variable_get('islandora_internet_archive_bookreader_image_max_width', '800');
-//    $imageServer = variable_get('islandora_internet_archive_bookreader_imageserver', 'djatoka');
-//    $iiifServerBaseURL = variable_get('islandora_internet_archive_bookreader_iiif_url', 'iiif/2');
-//    $enableToken = variable_get('islandora_internet_archive_bookreader_use_token', FALSE);
-//    $tilesourceURL_prefix = variable_get('islandora_internet_archive_bookreader_tile_url_prefix', 'http://127.0.0.1:8080/fedora/objects/');
-//    $tilesourceURL_suffix = variable_get('islandora_internet_archive_bookreader_tile_url_suffix', '/datastreams/JP2/content');
-//
-//    $pages = array();
-//    foreach ($variables['pages'] as $page_pid => $info) {
-//      if (($backup_uris) && ($imageServer == 'djatoka')) {
-//        $addendum = array('pid' => $page_pid);
-//      } else {
-//        $object_token = $enableToken ? '?token=' . islandora_get_object_token($page_pid, $dsid, 2) : '';
-//        $addendum = array('uri' => $tilesourceURL_prefix . $page_pid . $tilesourceURL_suffix . $object_token);
-//      }
-//      $pages[] = $info + $addendum;
-//    }
   }
   elseif ($page_source == 'iiif') {
     $identifier_string = variable_get('islandora_internet_archive_bookreader_iiif_identifier', '[islandora_iareader:url_token]');
@@ -97,6 +80,7 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
       'mode' => (int) variable_get('islandora_internet_archive_bookreader_default_page_view', 1),
       'mobilize' => variable_get('islandora_internet_archive_bookreader_mobile_full_screen', FALSE),
       'content_type' => variable_get('islandora_internet_archive_bookreader_content_type', 'book'),
+      'image_max_width' => variable_get('islandora_internet_archive_bookreader_image_max_width', '800'),
     ) + $page_source_settings,
   );
 

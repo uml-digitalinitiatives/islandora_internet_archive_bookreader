@@ -98,6 +98,10 @@ div.BRprogresspopup {
   width: 50%;
 }
 
+#BRtoolbarbuttons form.booksearch input[type=search] {
+    width:auto;
+}
+
 /*
  * Colorbox (used for displaying textarea with page OCR)
  *
@@ -600,10 +604,6 @@ html.mm-opening .mm-slideout {
  * jquery.mmenu.navbar.css equivalent
  */
 
-.mm-navbar-bottom, .mm-navbar-top ~ .mm-navbar-top {
-    border-bottom: none
-}
-
 .mm-menu > .mm-navbar {
     background: inherit;
     padding: 0;
@@ -612,53 +612,8 @@ html.mm-opening .mm-slideout {
     transform: translate3d(0, 0, 0)
 }
 
-.mm-navbar-bottom {
-    border-top-width: 1px;
-    border-top-style: solid;
-    top: auto;
-    bottom: 0
-}
-
-.mm-navbar-bottom ~ .mm-navbar-bottom {
-    border-top: none
-}
-
 .mm-navbar.mm-hasbtns {
     padding: 0 40px
-}
-
-.mm-navbar[class * =mm-navbar-content-] > * {
-    box-sizing: border-box;
-    display: block;
-    float: left
-}
-
-.mm-navbar .mm-breadcrumbs {
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    -webkit-overflow-scrolling: touch;
-    overflow-x: auto;
-    text-align: left;
-    padding: 0 0 0 17px
-}
-
-.mm-navbar .mm-breadcrumbs > * {
-    display: inline-block;
-    padding: 10px 3px
-}
-
-.mm-navbar .mm-breadcrumbs > a {
-    text-decoration: underline
-}
-
-.mm-navbar.mm-hasbtns .mm-breadcrumbs {
-    margin-left: -40px
-}
-
-.mm-navbar.mm-hasbtns .mm-btn:not(.mm-hidden) + .mm-breadcrumbs {
-    margin-left: 0;
-    padding-left: 0
 }
 
 .mm-navbar-top-1 {

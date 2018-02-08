@@ -143,7 +143,7 @@
     +     "<span class='BRtoolbarRight'>"
 
     +       "<span class='BRtoolbarSection tc ph10'>"
-    +         "<button class='BRtext fulltext'><span class=\"hide-md\">Full text</span></button>"
+    +         "<button class='BRicon full_text js-tooltip'></button>"
     +       "</span>"	  
 	  
     +       "<span class='BRtoolbarSection BRtoolbarSectionInfo tc ph10'>"
@@ -787,7 +787,7 @@ IslandoraBookReader.prototype.blankFulltextDiv = function() {
       '.BOOKREADERup': Drupal.t('Show/hide nav bar'),
       '.book_top': Drupal.t('First page'),
       '.book_bottom': Drupal.t('Last page'),
-      '.full_text' : Drupal.t('Full Text')
+      '.full_text' : Drupal.t('View full Text')
     };
     if ('rl' == this.pageProgression) {
       titles['.book_leftmost'] = Drupal.t('Last page');

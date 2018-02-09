@@ -440,7 +440,7 @@
    * Adjust the book viewer required styles in fullscreen.
    */
   IslandoraBookReader.prototype.resetReaderSizeAndStyle = function(height, top) {
-    $('div#book-viewer').css({
+    $('div#book-viewer, .ia-bookreader').css({
       'position': 'fixed',
       'width': '100%',
       'height': height,
@@ -528,7 +528,7 @@
       $('div#BRnav').css({'margin-top':'-40px'});
     }
     else {
-      $('div#book-viewer').css({
+      $('div#book-viewer, .ia-bookreader').css({
       'position': 'relative',
       'z-index': '0'
       });
@@ -548,7 +548,7 @@
    */
   IslandoraBookReader.prototype.goFullScreen = function() {
     this.fullscreen = true;
-    $('div#book-viewer').css({
+    $('div#book-viewer, .ia-bookreader').css({
       'position': 'fixed',
       'width': '100%',
       'height': '100%',

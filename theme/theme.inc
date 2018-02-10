@@ -102,7 +102,8 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
     'group' => CSS_SYSTEM,
   ));
   drupal_add_css("$module_path/css/islandora_internet_archive_bookreader.css");
-  
+  drupal_add_css("$module_path/css/jquery.mmenu.css");
+
   drupal_add_library('system', 'effects');
   drupal_add_library('system', 'ui.slider');
   drupal_add_library('system', 'ui.draggable');

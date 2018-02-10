@@ -34,6 +34,33 @@ div#BRpageview {
   background-color: #ccc;
 }
 
+div#BRfulltext.BRfloat {
+    height:550px;
+}
+
+@media (min-width: 801px) {
+    .BRfloat { max-width: initial; width:inherit; }
+    .BRfloat.wide { max-width: initial; width:inherit; }
+}
+@media (max-width: 800px) and (min-width: 341px) {
+    .BRfloat { max-width: initial; width:inherit; }
+}
+@media (max-width: 340px) {
+    .BRfloat { max-width: 95%; width:95%; }
+}
+
+div#BRfulltext .BRfloatMeta {
+  overflow: auto;
+  height: auto !important;
+  /* Prevents hiding text. */
+  max-height: 600px;
+}
+div.BRfloatHead {
+  background-color: #ccc !important;
+  padding: 10px 10px 15px;
+}
+
+
 .BRicon.full_text {
     background-image: url(../images/BRicons.png);
     opacity:.5;

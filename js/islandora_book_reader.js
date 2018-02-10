@@ -293,7 +293,7 @@
               $('.BRpageviewValue').val(window.location.href);
           }
       });
-      	jToolbar.find('.fulltext').colorbox({inline: true, opacity: "0.5", href: "#BRfulltext", onLoad: function() { 
+      	jToolbar.find('.full_text').colorbox({inline: true, opacity: "0.5", href: "#BRfulltext", onLoad: function() {
 		self.autoStop(); self.ttsStop();
 		self.buildFulltextDiv($('#BRfulltext')); 
 	} });	  
@@ -813,12 +813,17 @@ IslandoraBookReader.prototype.blankFulltextDiv = function() {
   IslandoraBookReader.prototype.toggleFullScreen = function() {
     this.fullscreen = (this.fullscreen ? false : true);
     if(this.fullscreen) {
+      var top = '0';
+      if ( $("#admin-menu").length) {
+        var admin_bar_height = $("#admin-menu").height();
+        top = admin_bar_height + "px";
+      }
       $('div#book-viewer').css({
         'position': 'fixed',
         'width': '100%',
         'height': '100%',
         'left': '0',
-        'top': '0',
+        'top': top,
         'z-index': '700'
       });
       $('div#BookReader').css({
@@ -846,12 +851,17 @@ IslandoraBookReader.prototype.blankFulltextDiv = function() {
    */
   IslandoraBookReader.prototype.goFullScreen = function() {
     this.fullscreen = true;
-      $('div#book-viewer').css({
+    var top = 0;
+    if ( $("#admin-menu").length) {
+      var admin_bar_height = $("#admin-menu").height();
+      top = admin_bar_height + "px";
+    }
+    $('div#book-viewer').css({
         'position': 'fixed',
         'width': '100%',
         'height': '100%',
         'left': '0',
-        'top': '0',
+        'top': top,
         'margin': '0',
         'padding': '0',
         'z-index': '1'
@@ -874,7 +884,16 @@ IslandoraBookReader.prototype.blankFulltextDiv = function() {
       var admin_bar_height = $("#admin-menu").height();
       top = admin_bar_height + "px";
       height = ($(window).height() - admin_bar_height) + "px";
-      this.resetReaderSizeAndStyle(height, top);
+      $('div#book-viewer').css({
+        'position': 'fixed',
+        'width': '100%',
+        'height': height,
+        'left': '0',
+        'top': top,
+        'z-index': '700'
+      });
+
+      this.resize();
     }
   }
   

@@ -14,7 +14,7 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
   $object = $variables['object'];
   $dsid = $variables['datastream_id'];
   $library_path = libraries_get_path('bookreader');
-  $colorbox_path = libraries_get_path('colorbox');
+//  $colorbox_path = libraries_get_path('colorbox');
   $module_path = drupal_get_path('module', 'islandora_internet_archive_bookreader');
   $search_uri = module_exists('islandora_solr') ? url("internet_archive_bookreader_search/{$object->id}/TERM", array('absolute' => TRUE)) : NULL;
   $page_source = variable_get('islandora_internet_archive_bookreader_pagesource', 'djatoka');
@@ -80,57 +80,70 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
       'mode' => (int) variable_get('islandora_internet_archive_bookreader_default_page_view', 1),
       'mobilize' => variable_get('islandora_internet_archive_bookreader_mobile_full_screen', FALSE),
       'content_type' => variable_get('islandora_internet_archive_bookreader_content_type', 'book'),
+      'image_max_width' => variable_get('islandora_internet_archive_bookreader_image_max_width', '800'),
     ) + $page_source_settings,
   );
 
+/**
+ *      IABR enhanced for mobile
+ */
+  $metamobile = array(
+    '#tag' => 'meta',
+    '#attributes' => array(
+       'name' => 'viewport',
+       'content' => 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no',
+    ),
+  );
+  drupal_add_html_head($metamobile, 'metamobile');  
+  
+  
   drupal_add_js($data_array, 'setting');
   drupal_add_css("$library_path/BookReader/BookReader.css", array(
     'group' => CSS_SYSTEM,
   ));
   drupal_add_css("$module_path/css/islandora_internet_archive_bookreader.css");
-  // Included jQuery 1.4.2 and jQueryUI 1.8.5 are not being used in favor of
-  // the Drupal system versions.
+  
   drupal_add_library('system', 'effects');
   drupal_add_library('system', 'ui.slider');
   drupal_add_library('system', 'ui.draggable');
 
-  // XXX: Extra slash is NOT an error or a mistake. We need to add this JS
-  // both before and after our custom jQuery gets setup, as we need it in both
-  // instances of jQuery.
-  drupal_add_js("$library_path/BookReader//jquery.bt.min.js", array(
+ 
+  drupal_add_js("$library_path/BookReader/jquery.colorbox-min.js", array(
     'group' => JS_LIBRARY,
     'weight' => -6,
-  ));
+  ));    
+  
   drupal_add_js("$module_path/js/detectmobilebrowser.js",
     array(
       'group' => JS_LIBRARY,
       'weight' => -6,
     )
   );
-  // Add the required jQuery version, specifying weight.
-  drupal_add_js("$module_path/js/jquery_1_5.min.js", array(
-    'group' => JS_LIBRARY,
-    'weight' => -6,
-  ));
-  // We also need to be sure to use the correct jquery ui version.
-  drupal_add_js("$module_path/js/jquery.ui-1.8.10/jquery-ui.min.js", array(
-    'group' => JS_LIBRARY,
-    'weight' => -6,
-  ));
-  drupal_add_js("$library_path/BookReader/dragscrollable.js", array(
-    'group' => JS_LIBRARY,
-    'weight' => -6,
-  ));
-  // Use a newer version of color box as the version bundled with BookReader
-  // won't work with JQuery 1.4.4
-  drupal_add_js("$colorbox_path/jquery.colorbox-min.js", array(
-    'group' => JS_LIBRARY,
-    'weight' => -6,
-  ));
+  drupal_add_js("$library_path/BookReader/jquery.browser.min.js", array(
+      'group' => JS_LIBRARY,
+      'weight' => -6,
+    ));
+  
   drupal_add_js("$library_path/BookReader/jquery.bt.min.js", array(
     'group' => JS_LIBRARY,
     'weight' => -6,
+  )); 
+  
+  drupal_add_js("$library_path/BookReader/dragscrollable-br.js", array(
+    'group' => JS_LIBRARY,
+    'weight' => -6,
   ));
+  
+  drupal_add_js("$library_path/BookReader/mmenu/dist/js/jquery.mmenu.min.js", array(
+    'group' => JS_LIBRARY,
+    'weight' => -6,
+  ));
+  
+  drupal_add_js("$library_path/BookReader/mmenu/dist/addons/navbars/jquery.mmenu.navbars.min.js", array(
+    'group' => JS_LIBRARY,
+    'weight' => -6,
+  ));
+  
   drupal_add_js("$library_path/BookReader/BookReader.js", array(
     'group' => JS_LIBRARY,
     'weight' => -6,
@@ -178,6 +191,8 @@ function template_preprocess_islandora_internet_archive_bookreader(array &$varia
  */
 function theme_islandora_internet_archive_bookreader_book_info(array $variables) {
   module_load_include('inc', 'islandora', 'includes/metadata');
+  //--Name of Views or empty for default info tab
+  $infoTab_views = variable_get('islandora_internet_archive_bookreader_info_views', '');
 
   $object = $variables['object'];
 
@@ -185,26 +200,39 @@ function theme_islandora_internet_archive_bookreader_book_info(array $variables)
   // metadata in printable form.
   $metadata = islandora_retrieve_metadata_markup($object, TRUE);
   $viewer = variable_get('islandora_metadata_display', 'dublin_core');
-  // Let's default back to what IAV had before for a default.
-  if ($viewer != 'dublin_core' && $metadata) {
-    $content = $metadata;
+
+  //--info_views empty = default
+  if ($infoTab_views == '') {
+
+    // Let's default back to what IAV had before for a default.
+    if ($viewer != 'dublin_core' && $metadata) {
+      $content = $metadata;
+    } else {
+      $fields = islandora_internet_archive_bookreader_info_fields($object);
+      $convert_to_string = function ($o) {
+        return implode('<br/>', $o);
+      };
+      $fields = array_map($convert_to_string, $fields);
+      $rows = array_map(NULL, array_keys($fields), array_values($fields));
+      $content = theme('table', array(
+        'caption' => '',
+        'empty' => t('No Information specified.'),
+        'attributes' => array(),
+        'colgroups' => array(),
+        'header' => array(t('Field'), t('Values')),
+        'rows' => $rows,
+        'sticky' => FALSE));
+    }
+
   }
+  //--info_views not empty = use Views (PID passed to views as contextual variable)
   else {
-    $fields = islandora_internet_archive_bookreader_info_fields($object);
-    $convert_to_string = function($o) {
-      return implode('<br/>', $o);
-    };
-    $fields = array_map($convert_to_string, $fields);
-    $rows = array_map(NULL, array_keys($fields), array_values($fields));
-    $content = theme('table', array(
-      'caption' => '',
-      'empty' => t('No Information specified.'),
-      'attributes' => array(),
-      'colgroups' => array(),
-      'header' => array(t('Field'), t('Values')),
-      'rows' => $rows,
-      'sticky' => FALSE));
+    $args = array($object->id);
+    $view = views_get_view($infoTab_views);
+    $content=$view->preview('default', $args);
   }
+	  
+	  
   return $content;
 }
 

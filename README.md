@@ -24,7 +24,7 @@ Install as usual, see [this](https://drupal.org/documentation/install/modules-th
 
 Download/clone the [Internet Archive BookReader](https://github.com/Islandora/internet_archive_bookreader.git) to `sites/all/libraries/bookreader`, or run `drush iabookreader-plugin`.
 
-Internet Archive BookReader [Developer documentation](http://openlibrary.org/dev/docs/bookreader)
+Internet Archive BookReader [Developer documentation](https://openlibrary.org/dev/docs/bookreader)
 
 This module requires that you set up Djatoka, please follow the steps outlined at [here](https://wiki.duraspace.org/pages/viewpage.action?pageId=34658947).
 
@@ -53,7 +53,7 @@ Having problems or solved a problem? Check out the Islandora google groups for a
 
 Current maintainers:
 
-* [Daniel Aitken](https://github.com/qadan)
+* [Diego Pino](https://github.com/DiegoPino)
 
 ## Development
 

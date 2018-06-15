@@ -52,7 +52,7 @@ You can setup which 'Solr field relating pages to book PIDs' is used, the amount
 
 This module is able to use either Adore-djatoka or an IIIF Image API compliant Image Server as source for each book's page image.
 
-#### Adore-djatoka 
+#### Adore-djatoka
 
 Djatoka specific options are:
 
@@ -64,7 +64,7 @@ Note: The Adore-datoka Server URI (Open URL endpoint) must be set from [Islandor
 
 #### IIIF
 
-Any [IIIF](http://iiif.io) image server can be used as the IIIF tile source. 
+Any [IIIF](http://iiif.io) image server can be used as the IIIF tile source.
 
 The IIIF Image Server Base URL needs to be setup here. This URL can be relative or absolute but needs to be openly accessible to a visiting user (Ajax).
 

@@ -11,7 +11,7 @@ This module doesn't do much on its own, its assummed that it will be used in con
 This module requires the following modules/libraries:
 
 * [Islandora](https://github.com/islandora/islandora)
-* [Islandora Paged Content](tps://github.com/islandora/islandora_paged_content)
+* [Islandora Paged Content](https://github.com/islandora/islandora_paged_content)
 * [Libraries API](https://www.drupal.org/project/libraries)
 * [Colorbox](https://www.drupal.org/project/colorbox)
 * [Drupal Token Module](https://www.drupal.org/project/token)
@@ -59,7 +59,7 @@ Djatoka specific options are:
  * Compression level (the larger the number, the lower the quality but also the smaller the file size)
  * Using an Object's JPG datastream as a backup in case Djatoka cannot return a JP2. 
 
-Note: The Adore-datoka Server URI (Open URL endpoint) must be set from [Islandora Paged Content] (https://github.com/islandora/islandora_paged_content) Solution Pack's admin settings.
+Note: The Adore-datoka Server URI (Open URL endpoint) must be set from [Islandora Paged Content](https://github.com/islandora/islandora_paged_content) Solution Pack's admin settings.
 
 
 #### IIIF

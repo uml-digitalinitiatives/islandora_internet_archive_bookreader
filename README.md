@@ -4,7 +4,7 @@
 
 An Islandora wrapper for the Internet Archive BookReader.
 
-This module doesn't do much on its own, it is assummed that it will be used in conjunction with a solution pack, where it will be enabled as a viewer.
+This module doesn't do much on its own, it is assumed that it will be used in conjunction with a solution pack, where it will be enabled as a viewer.
 
 ## Requirements
 

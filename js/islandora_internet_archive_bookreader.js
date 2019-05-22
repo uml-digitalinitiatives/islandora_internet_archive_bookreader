@@ -36,6 +36,9 @@
           bookReader.goFullScreen();
           bookReader.switchMode(1);
         }
+        else if (settings.islandoraInternetArchiveBookReader.mode) {
+          bookReader.switchMode(settings.islandoraInternetArchiveBookReader.mode);
+        }
       });
     }
   };

@@ -615,9 +615,15 @@ IslandoraBookReader.prototype.blankFulltextDiv = function() {
       // If pageProgression is not set RTL we assume it is LTR
       if (0 == (index & 0x1)) {
         // Even-numbered page
+        if (false === this.hasCover) {
+          return 'L';
+        }
         return 'R';
       }
       else {
+        if (false === this.hasCover) {
+          return 'R';
+        }
         // Odd-numbered page
         return 'L';
       }
@@ -625,9 +631,15 @@ IslandoraBookReader.prototype.blankFulltextDiv = function() {
     else {
       // RTL
       if (0 == (index & 0x1)) {
+        if (false === this.hasCover) {
+          return 'R';
+        }
         return 'L';
       }
       else {
+      if (false === this.hasCover) {
+          return 'L';
+        }
         return 'R';
       }
     }
@@ -673,7 +685,7 @@ IslandoraBookReader.prototype.blankFulltextDiv = function() {
   IslandoraBookReader.prototype.search = function(term, options) {
     options = options !== undefined ? options : {};
     var that = this;
-	var defaultOptions = {
+    var defaultOptions = {
         // {bool} (default=false) goToFirstResult - jump to the first result
         goToFirstResult: false,
         // {bool} (default=false) disablePopup - don't show the modal progress
@@ -685,7 +697,7 @@ IslandoraBookReader.prototype.blankFulltextDiv = function() {
     term = term.replace(/\//g, ' '); // strip slashes, since this goes in the url
     this.searchTerm = term;
     this.removeSearchResults();
-	this.updateLocationHash(true);
+    this.updateLocationHash(true);
     this.showProgressPopup('<img id="searchmarker" src="'+ this.imagesBaseURL + 'marker_srch-on.png'+'">' + Drupal.t('Search results will appear below ...') + '</img>');
    
     $.ajax({url:url, dataType:'json',
@@ -765,7 +777,7 @@ IslandoraBookReader.prototype.blankFulltextDiv = function() {
   IslandoraBookReader.prototype.initUIStrings = function() {
     // Navigation handlers will be bound after all UI is in place -- makes moving icons between
     // the toolbar and nav bar easier
-	  var titles = {
+    var titles = {
       '.logo': Drupal.t('Go to Archive.org'), // $$$ update after getting OL record
       '.zoom_in': Drupal.t('Zoom in'),
       '.zoom_out': Drupal.t('Zoom out'),
@@ -873,6 +885,50 @@ IslandoraBookReader.prototype.blankFulltextDiv = function() {
       this.resize();
   }
 
+  /**
+   * Update the location hash only change it when it actually changes, as some
+   * browsers can't handle that stuff.
+	 */
+  IslandoraBookReader.prototype.updateLocationHash = function(skipAnalytics) {
+    // Analytics is one of the many things that are Internet Archive Specific.
+    // Never used here, just kept to have the same function signature as 
+    // Bookreader 2.x
+    skipAnalytics = TRUE;
+    // Updated with fix to recent bug found in the Archive Viewer that
+    // prevents the last page from displaying the correct transcriptions
+    // or hash links.
+
+    // Get the current page, from elements text.
+    var page_string = $('#pagenum .currentpage').text();
+    if (page_string) {
+      var p_arr = page_string.split(" ");
+      var p_index = p_arr[1];
+      index = p_index;
+    }
+    else {
+      index = 1;
+    }
+
+    var newHash = '#' + this.fragmentFromParams(this.paramsFromCurrent());
+    if (page_string != this.currentIndex() && page_string) {
+      var param_data = this.fragmentFromParams(this.paramsFromCurrent()).split("/");
+      param_data[1] = index;
+      newHash = '#' + replaceAll(',','/',param_data.toString());
+    }
+    // End bug fix.
+    if (this.oldLocationHash != newHash) {
+      window.location.hash = newHash;
+      this.resize();
+    }
+
+    // This is the variable checked in the timer.  Only user-generated changes
+    // to the URL will trigger the event.
+    this.oldLocationHash = newHash;
+  }
+
+  function replaceAll(find, replace, str) {
+    return str.replace(new RegExp(find, 'g'), replace);
+  }
   
   /**
    * Window resize event callback, handles admin menu

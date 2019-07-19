@@ -13,7 +13,7 @@ define('IABOOKREADER_DOWNLOAD_URI', 'https://github.com/internetarchive/bookread
 /**
  * The original extracted directory from the zip file.
  */
-define('IABOOKREADER_ORIGINAL_DIR', 'internet_archive_bookreader-2.0.2');
+define('IABOOKREADER_ORIGINAL_DIR', 'bookreader-2.0.2');
 
 /**
  * Implements hook_drush_command().

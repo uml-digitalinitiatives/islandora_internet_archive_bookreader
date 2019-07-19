@@ -944,8 +944,16 @@ IslandoraBookReader.prototype.blankFulltextDiv = function() {
             whiteSpace: 'nowrap'
           },
         }
-      )
-      ;
+      );
   }
-  
+  // Overrides paramsFromFragment().
+  //______________________________________________________________________________
+  IslandoraBookReader.prototype.paramsFromFragment = function(urlFragment) {
+     if (/#overlay=/.test(urlFragment)) {
+       // We are on the Drupal Admin overlay. return instead of processing the Params.
+       return;
+     }
+     // Call the original Method.
+     return BookReader.prototype.paramsFromFragment(urlFragment);
+   }
 })(jQuery);

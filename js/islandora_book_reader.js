@@ -298,7 +298,7 @@
 		self.autoStop(); self.ttsStop();
 		self.buildFulltextDiv($('#BRfulltext')); 
 	} });	  
-      jToolbar.find('.info').colorbox({inline: true, opacity: "0.5", href: "#BRinfo", onLoad: function() { self.autoStop(); self.ttsStop(); } });
+      jToolbar.find('.info').colorbox({inline: true,  maxWidth:"80%", maxHeight:"80%", opacity: "0.5", href: "#BRinfo", onLoad: function() { self.autoStop(); self.ttsStop(); } });
       jToolbar.find('.full').bind('click', function() {
         self.toggleFullScreen();
       });
@@ -885,51 +885,6 @@ IslandoraBookReader.prototype.blankFulltextDiv = function() {
       this.resize();
   }
 
-  /**
-   * Update the location hash only change it when it actually changes, as some
-   * browsers can't handle that stuff.
-	 */
-  IslandoraBookReader.prototype.updateLocationHash = function(skipAnalytics) {
-    // Analytics is one of the many things that are Internet Archive Specific.
-    // Never used here, just kept to have the same function signature as 
-    // Bookreader 2.x
-    skipAnalytics = TRUE;
-    // Updated with fix to recent bug found in the Archive Viewer that
-    // prevents the last page from displaying the correct transcriptions
-    // or hash links.
-
-    // Get the current page, from elements text.
-    var page_string = $('#pagenum .currentpage').text();
-    if (page_string) {
-      var p_arr = page_string.split(" ");
-      var p_index = p_arr[1];
-      index = p_index;
-    }
-    else {
-      index = 1;
-    }
-
-    var newHash = '#' + this.fragmentFromParams(this.paramsFromCurrent());
-    if (page_string != this.currentIndex() && page_string) {
-      var param_data = this.fragmentFromParams(this.paramsFromCurrent()).split("/");
-      param_data[1] = index;
-      newHash = '#' + replaceAll(',','/',param_data.toString());
-    }
-    // End bug fix.
-    if (this.oldLocationHash != newHash) {
-      window.location.hash = newHash;
-      this.resize();
-    }
-
-    // This is the variable checked in the timer.  Only user-generated changes
-    // to the URL will trigger the event.
-    this.oldLocationHash = newHash;
-  }
-
-  function replaceAll(find, replace, str) {
-    return str.replace(new RegExp(find, 'g'), replace);
-  }
-  
   /**
    * Window resize event callback, handles admin menu
    * in Drupal.

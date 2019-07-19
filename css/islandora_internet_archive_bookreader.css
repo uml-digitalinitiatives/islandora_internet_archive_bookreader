@@ -95,6 +95,7 @@ button#btnSrch {
   background-image: none;
   padding: 0;
   margin: 0;
+  cursor: pointer;
 }
 button#btnSrch:hover {
   background-image: none;
@@ -117,10 +118,10 @@ div.BRprogresspopup {
 }
 
 #BRtoolbarbuttons form.booksearch input[type=search] {
-    width:auto;
+  width:auto;
 }
 
 #cboxLoadedContent {
-        overflow-y: auto!important; /* to make fulltext scrollable */
-        margin: 5px;
+  overflow-y: auto!important; /* to make fulltext scrollable */
+  margin: 5px;
 }

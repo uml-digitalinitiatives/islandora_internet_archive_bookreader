@@ -956,4 +956,15 @@ IslandoraBookReader.prototype.blankFulltextDiv = function() {
      // Call the original Method.
      return BookReader.prototype.paramsFromFragment(urlFragment);
    }
+  // Overrides buildShareDiv().
+   IslandoraBookReader.prototype.buildShareDiv = function(jShareDiv) {
+     BookReader.prototype.buildShareDiv.call(this, jShareDiv);
+     var finishedDiv = jShareDiv.find("button.share-finished");
+     if (finishedDiv.length > 0) {
+       finishedDiv[0].setAttribute('onclick', "parent.jQuery.colorbox.close();");
+     }
+     // No embed for us.
+     jShareDiv.find('fieldset.fieldset-embed').remove();
+   }
+
 })(jQuery);

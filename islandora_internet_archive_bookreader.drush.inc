@@ -8,12 +8,12 @@
 /**
  * The Internet Archive Bookreader plugin URI.
  */
-define('IABOOKREADER_DOWNLOAD_URI', 'https://github.com/Islandora/internet_archive_bookreader/archive/master.zip');
+define('IABOOKREADER_DOWNLOAD_URI', 'https://github.com/internetarchive/bookreader/archive/2.0.2.zip');
 
 /**
- * The original extracted directory frome the zip file.
+ * The original extracted directory from the zip file.
  */
-define('IABOOKREADER_ORIGINAL_DIR', 'internet_archive_bookreader-master');
+define('IABOOKREADER_ORIGINAL_DIR', 'bookreader-2.0.2');
 
 /**
  * Implements hook_drush_command().

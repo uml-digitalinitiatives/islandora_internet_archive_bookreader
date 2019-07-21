@@ -31,7 +31,7 @@ Allows OCR based search using the Viewer's Search box.
 
 Install as usual, see [this](https://drupal.org/documentation/install/modules-themes/modules-7) for further information.
 
-Download/clone our fork of the [Internet Archive BookReader](https://github.com/Islandora/internet_archive_bookreader.git) to `sites/all/libraries/bookreader`, or run `drush iabookreader-plugin`. This is currently the only version we support.
+Download the 2.0.2 version of the [Internet Archive BookReader](https://github.com/internetarchive/bookreader/tree/2.0.2)* to `sites/all/libraries/bookreader`, or run `drush iabookreader-plugin`. If you are upgrading from the 7.x-1.11 or older version of this module, you will need to replace your old copy of this library. *(Newer versions than 2.0.2 may work but have not been tested.)*
 
 This module requires that you set up either Djatoka or an IIIF Image API compliant Image Sever. For Djatoka please follow the steps outlined at [here](https://wiki.duraspace.org/display/ISLANDORA/Djatoka).
 

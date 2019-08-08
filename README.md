@@ -37,7 +37,7 @@ This module requires that you set up either Djatoka or an IIIF Image API complia
 
 This module requires [Colorbox](https://www.drupal.org/project/colorbox) and its dependant library [Colorbox library](http://www.jacklmoore.com/colorbox/). Depending on the version of the Colorbox module and library you are using, there can be some issues with Colorbox finding the library. [This](https://www.drupal.org/node/1074474#comment-9137159) comment solves the issue.
 
-Note: If you use the Drush command, it is advisable to Move (not copy) the [install script](https://github.com/islandora/islandora_internet_archive_bookreader/blob/7.x-1.11/islandora_internet_archive_bookreader.drush.inc) to your `.drush` folder before running it.
+Note: If you use the Drush command, it is advisable to Move (not copy) the [install script](https://github.com/islandora/islandora_internet_archive_bookreader/blob/7.x-1.13/islandora_internet_archive_bookreader.drush.inc) to your `.drush` folder before running it.
 
 ## Configuration
 

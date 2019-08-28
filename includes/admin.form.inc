@@ -22,20 +22,8 @@ function islandora_internet_archive_bookreader_admin_settings_form(array $form, 
     return isset($form_state['values'][$name]) ? $form_state['values'][$name] : variable_get($name, $default);
   };
   $solr_enabled = module_exists('islandora_solr');
-  $imageserver_settings = islandora_imageserver_get_settings();
   $form = array(
-    'islandora_internet_archive_bookreader_pagesource' => array(
-      '#type' => 'select',
-      '#title' => t('Image Server'),
-      '#description' => t('The image server to use with IA Bookreader, configure at Admin -> Islandora -> Image server configuration'),
-      '#default_value' => $imageserver_settings['type'],
-      '#disabled' => TRUE,
-      '#options' => array(
-          'none' => t('No image server configured'),
-          'iiif' => t('IIIF image server'),
-          'djatoka' => t('Adore-Djatoka image server'),
-      ),
-    ),
+    'islandora_internet_archive_bookreader_pagesource' => islandora_imageserver_get_type_selectbox(),
     'djatoka' => array(
       '#type' => 'fieldset',
       '#title' => t('Adore Djatoka Image Server Settings'),
